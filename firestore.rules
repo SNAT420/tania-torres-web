@@ -8,7 +8,7 @@ service cloud.firestore {
     // por eso no basta con "estar logueado"; se revisa el correo.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['CORREO_ADMIN'];
+        && request.auth.token.email in ['taniatorresvivar@gmail.com'];
     }
 
     // Teléfono, correo, WhatsApp y foto de perfil: los lee la página,

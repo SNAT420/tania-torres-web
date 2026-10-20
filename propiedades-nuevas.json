@@ -1,0 +1,48 @@
+[
+  {
+    "slug": "viande-tlaquepaque",
+    "title": "Departamento en Viande, Tlaquepaque",
+    "type": "venta",
+    "price": 1735000,
+    "location": "Viande, San Pedro Tlaquepaque, Jalisco",
+    "beds": 2,
+    "baths": 1,
+    "size": 0,
+    "parking": 1,
+    "description": "Departamento en venta en Viande, Tlaquepaque. Precio desde $1,735,000.\n\n• 2 recámaras\n• 1 baño\n• Sala-comedor con balcón\n• Cocina integral con parrilla y campana\n• Cuarto de lavado\n• 1 estacionamiento\n• Coto privado con áreas comunes y cancha\n\nAcepta todos los créditos: Infonavit, Fovissste, bancario y contado.\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/viande-01.jpg",
+      "/img/propiedades/viande-02.jpg",
+      "/img/propiedades/viande-03.jpg",
+      "/img/propiedades/viande-04.jpg",
+      "/img/propiedades/viande-05.jpg",
+      "/img/propiedades/viande-06.jpg",
+      "/img/propiedades/viande-07.jpg",
+      "/img/propiedades/viande-08.jpg"
+    ]
+  },
+  {
+    "slug": "la-arboleda-magenta",
+    "title": "Casa en La Arboleda, Modelo Magenta",
+    "type": "venta",
+    "price": 1923650,
+    "location": "La Arboleda, Real del Valle, Tlajomulco de Zúñiga, Jalisco",
+    "beds": 3,
+    "baths": 2,
+    "size": 73,
+    "parking": 1,
+    "description": "Casa nueva en La Arboleda, Real del Valle, Tlajomulco. Modelo Magenta. Precio desde $1,923,650.\n\nPlanta baja:\n• Cochera para 1 auto\n• Sala-comedor\n• Cocina\n• Recámara\n• Baño completo\n• Patio de servicio\n\nSegundo nivel:\n• 2 recámaras\n• Baño completo\n• Balcón\n\nConstrucción: 72.86 m² · Terreno desde 73.60 m²\nIncluye cocina y clósets.\n\nPromoción: $100,000 de descuento o pago de escrituras (no aplican las dos promociones juntas).\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/la-arboleda-01.jpg",
+      "/img/propiedades/la-arboleda-02.jpg",
+      "/img/propiedades/la-arboleda-03.jpg",
+      "/img/propiedades/la-arboleda-04.jpg",
+      "/img/propiedades/la-arboleda-05.jpg",
+      "/img/propiedades/la-arboleda-06.jpg",
+      "/img/propiedades/la-arboleda-07.jpg",
+      "/img/propiedades/la-arboleda-08.jpg",
+      "/img/propiedades/la-arboleda-09.jpg",
+      "/img/propiedades/la-arboleda-10.jpg"
+    ]
+  }
+]

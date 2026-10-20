@@ -908,7 +908,7 @@
     .modal-feat-val { font-size: 1.2rem; font-weight: 600; color: var(--gold); }
     .modal-feat-label { font-size: 0.75rem; color: var(--text-muted); }
 
-    .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.5rem; }
+    .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.5rem; white-space: pre-line; }
 
     .modal-cta {
       display: flex;
@@ -1675,6 +1675,11 @@
 
     <!-- PROPIEDADES TAB -->
     <div class="admin-section active" id="tab-props">
+      <div class="admin-form" id="pending-props" style="display:none;border-color:var(--gold)">
+        <h3>Propiedades listas para publicar</h3>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem">Ya tienen fotos, datos y descripción. Revisa y dale "Publicar".</p>
+        <div id="pending-props-list" class="admin-prop-list"></div>
+      </div>
       <div class="admin-form">
         <h3>+ Agregar nueva propiedad</h3>
         <div class="form-row">
@@ -2143,6 +2148,7 @@ function openAdmin() {
   renderAdminProps();
   renderAdminReviews();
   loadSettingsForm();
+  loadPreparedProps();
 }
 window.closeAdmin = function() { document.getElementById('admin-overlay').classList.remove('open'); document.body.style.overflow = ''; };
 window.adminTab = function(name, btn) {
@@ -2428,6 +2434,49 @@ function renderHeroRating() {
   document.getElementById('hero-rating-count').textContent = approved.length;
   box.style.display = 'inline-flex';
 }
+
+
+// ════════════════════════════════════════════════════════
+// PROPIEDADES PREPARADAS (propiedades-nuevas.json)
+// ════════════════════════════════════════════════════════
+let pendingPrepared = [];
+async function loadPreparedProps() {
+  try {
+    const res = await fetch('/propiedades-nuevas.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const list = await res.json();
+    const have = new Set(allProps.map(p => p.slug).filter(Boolean));
+    pendingPrepared = list.filter(p => !have.has(p.slug));
+  } catch (e) { pendingPrepared = []; }
+  renderPreparedProps();
+}
+function renderPreparedProps() {
+  const box = document.getElementById('pending-props');
+  if (!box) return;
+  if (!pendingPrepared.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  document.getElementById('pending-props-list').innerHTML = pendingPrepared.map((p, i) => `
+    <div class="admin-prop-item">
+      <img src="${esc(p.images[0])}" class="admin-prop-thumb" alt="">
+      <div class="admin-prop-info">
+        <div class="admin-prop-title">${esc(p.title)}</div>
+        <div class="admin-prop-meta">${fmt(p.price, p.type)} · ${esc(p.location)} · ${p.images.length} fotos</div>
+      </div>
+      <div class="admin-prop-actions">
+        <button class="btn-edit" onclick="window.publishPrepared(${i})">Publicar</button>
+      </div>
+    </div>`).join('');
+}
+window.publishPrepared = async function(i) {
+  const p = pendingPrepared[i];
+  if (!p) return;
+  try {
+    await addDoc(propsCol, { ...p, date: new Date().toISOString() });
+    pendingPrepared.splice(i, 1);
+    renderPreparedProps();
+    toast('✓ Propiedad publicada');
+  } catch (e) { toast('No se pudo publicar. Revisa que hayas iniciado sesión.'); console.error(e); }
+};
 
 // ════════════════════════════════════════════════════════
 // INICIALIZACIÓN Y LISTENERS EN TIEMPO REAL

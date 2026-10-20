@@ -1458,9 +1458,12 @@
   <div class="login-box">
     <div class="logo">Tania Torres</div>
     <p>Panel de Administración</p>
-    <input type="password" id="admin-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkLogin()">
-    <p class="login-error" id="login-error">Contraseña incorrecta</p>
-    <button class="btn-submit" onclick="checkLogin()">Ingresar</button>
+    <input type="email" id="admin-email" placeholder="Correo" autocomplete="username" style="margin-bottom:0.75rem">
+    <input type="password" id="admin-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkLogin()">
+    <p class="login-error" id="login-error">Correo o contraseña incorrectos</p>
+    <button class="btn-submit" id="login-btn" onclick="checkLogin()">Ingresar</button>
+    <br>
+    <button class="btn-cancel-login" onclick="resetAdminPass()">¿Olvidaste tu contraseña?</button>
     <br>
     <button class="btn-cancel-login" onclick="closeAdminLogin()">Cancelar</button>
   </div>
@@ -1470,7 +1473,10 @@
 <div id="admin-overlay">
   <div class="admin-nav">
     <h2>⚡ Panel de Administración · Tania Torres</h2>
-    <button class="btn-close-admin" onclick="closeAdmin()">✕ Cerrar panel</button>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn-close-admin" onclick="closeAdmin()">✕ Cerrar panel</button>
+      <button class="btn-close-admin" onclick="logoutAdmin()">Cerrar sesión</button>
+    </div>
   </div>
   <div class="admin-tabs">
     <div class="admin-tab active" onclick="adminTab('props', this)">🏠 Propiedades</div>
@@ -1586,10 +1592,7 @@
           </div>
           <input type="file" id="s-photo-file" accept="image/*" style="display:none" onchange="handleProfilePhoto(event)">
         </div>
-        <div class="form-group">
-          <label>Nueva contraseña del panel (dejar vacío para no cambiar)</label>
-          <input type="password" id="s-pass" placeholder="Nueva contraseña">
-        </div>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem">Para cambiar la contraseña del panel, cierra sesión y usa "¿Olvidaste tu contraseña?". Te llegará un correo para elegir una nueva.</p>
         <button class="btn-submit" onclick="saveSettings()">Guardar cambios</button>
       </div>
     </div>
@@ -1638,6 +1641,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, orderBy, query, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ════════════════════════════════════════════════════════
@@ -1656,13 +1660,14 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+let adminUser = null;
+onAuthStateChanged(auth, u => { adminUser = u; });
 
 const propsCol    = collection(db, 'properties');
 const reviewsCol  = collection(db, 'reviews');
 const settingsRef = doc(db, 'config', 'settings');
 
-// Contraseña admin (se guarda en Firebase; sin respaldo en el código)
-let cachedPass = null;
 
 // ════════════════════════════════════════════════════════
 // UTILS
@@ -1859,12 +1864,47 @@ window.submitReview = async function() {
 // ════════════════════════════════════════════════════════
 // ADMIN — LOGIN
 // ════════════════════════════════════════════════════════
-window.openAdminLogin  = function() { document.getElementById('login-modal').classList.add('open'); setTimeout(() => document.getElementById('admin-pass').focus(), 100); };
-window.closeAdminLogin = function() { document.getElementById('login-modal').classList.remove('open'); document.getElementById('admin-pass').value = ''; document.getElementById('login-error').style.display = 'none'; };
-window.checkLogin = function() {
-  const pass = document.getElementById('admin-pass').value;
-  if (cachedPass && pass === cachedPass) { window.closeAdminLogin(); openAdmin(); }
-  else { document.getElementById('login-error').style.display = 'block'; document.getElementById('admin-pass').value = ''; document.getElementById('admin-pass').focus(); }
+window.openAdminLogin = function() {
+  if (adminUser) { openAdmin(); return; }
+  document.getElementById('login-modal').classList.add('open');
+  setTimeout(() => document.getElementById('admin-email').focus(), 100);
+};
+window.closeAdminLogin = function() {
+  document.getElementById('login-modal').classList.remove('open');
+  document.getElementById('admin-pass').value = '';
+  document.getElementById('login-error').style.display = 'none';
+};
+window.checkLogin = async function() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pass  = document.getElementById('admin-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-error');
+  if (!email || !pass) { err.textContent = 'Escribe tu correo y contraseña'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.closeAdminLogin();
+    openAdmin();
+  } catch (e) {
+    err.textContent = e.code === 'auth/too-many-requests'
+      ? 'Demasiados intentos. Espera unos minutos.'
+      : 'Correo o contraseña incorrectos';
+    err.style.display = 'block';
+    document.getElementById('admin-pass').value = '';
+  } finally { btn.disabled = false; btn.textContent = 'Ingresar'; }
+};
+window.resetAdminPass = async function() {
+  const email = document.getElementById('admin-email').value.trim();
+  const err = document.getElementById('login-error');
+  if (!email) { err.textContent = 'Escribe tu correo arriba y vuelve a dar clic aquí'; err.style.display = 'block'; return; }
+  try { await sendPasswordResetEmail(auth, email); } catch (e) { /* no revelar si el correo existe */ }
+  err.style.display = 'none';
+  toast('Si el correo está registrado, te llegará un enlace para cambiar la contraseña');
+};
+window.logoutAdmin = async function() {
+  await signOut(auth);
+  window.closeAdmin();
+  toast('Sesión cerrada');
 };
 
 // ════════════════════════════════════════════════════════
@@ -2108,15 +2148,11 @@ window.saveSettings = async function() {
   const phone = document.getElementById('s-phone').value.trim();
   const email = document.getElementById('s-email').value.trim();
   const wa    = document.getElementById('s-wa').value.trim();
-  const newPass = document.getElementById('s-pass').value;
   const profilePhoto = pendingProfilePhoto !== null ? pendingProfilePhoto : (siteSettings.profilePhoto || '');
-  const adminPass = newPass || cachedPass;
 
   try {
-    await setDoc(settingsRef, { phone, email, wa, profilePhoto, adminPass });
-    siteSettings = { phone, email, wa, profilePhoto, adminPass };
-    cachedPass = adminPass;
-    if (newPass) { document.getElementById('s-pass').value = ''; }
+    await setDoc(settingsRef, { phone, email, wa, profilePhoto });
+    siteSettings = { phone, email, wa, profilePhoto };
 
     // Actualizar contacto en pantalla
     const ph = document.getElementById('contact-phone');
@@ -2165,7 +2201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const snap = await getDoc(settingsRef);
     if (snap.exists()) {
       siteSettings = snap.data();
-      if (siteSettings.adminPass) cachedPass = siteSettings.adminPass;
       const ph = document.getElementById('contact-phone');
       const em = document.getElementById('contact-email');
       if (ph) { ph.textContent = siteSettings.phone; ph.closest('a').href = 'tel:' + siteSettings.phone.replace(/\s/g,''); }

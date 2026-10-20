@@ -36,5 +36,17 @@ service cloud.firestore {
         && request.resource.data.date is string;
       allow update, delete: if isAdmin();
     }
+
+    // Panel privado: prospectos, citas y mensajes. Solo el admin.
+    // Los mensajes los escribe la función /api/manychat con la cuenta de servicio (no pasa por estas reglas).
+    match /prospects/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /appointments/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /inbox/{id} {
+      allow read, update, delete: if isAdmin();
+    }
   }
 }

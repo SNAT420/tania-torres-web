@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel · Tania Torres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a working desk. Sticky header with tabs; each tab is one job (hoy, embudo, agenda, redes). Gold marks only what needs action. */
+:root{
+  --bg:#f6f3ed; --surface:#ffffff; --surface-2:#efe9de; --line:#ddd3c2;
+  --fg:#1b1814; --muted:#6d6558; --gold:#8c6a2c; --gold-ink:#ffffff; --gold-soft:#e9dcc2;
+  --ok:#2f7a4f; --warn:#a2621a; --bad:#a83a32; --info:#3d5f8c;
+  --st-prospecto:#8c6a2c; --st-tramite:#3d5f8c; --st-pregunto:#7a7468; --st-sinrespuesta:#a83a32; --st-cita:#2f7a4f;
+  --serif:"Playfair Display",Georgia,"Times New Roman",serif;
+  --sans:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:10px; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e0d0b; --surface:#181614; --surface-2:#211e1a; --line:#332e27;
+  --fg:#f2ede4; --muted:#a59d90; --gold:#d1ab64; --gold-ink:#14110c; --gold-soft:#3a2f1c;
+  --ok:#6cc08e; --warn:#e0a35a; --bad:#e2766c; --info:#8db0dd;
+  --st-prospecto:#d1ab64; --st-tramite:#8db0dd; --st-pregunto:#a59d90; --st-sinrespuesta:#e2766c; --st-cita:#6cc08e;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e0d0b; --surface:#181614; --surface-2:#211e1a; --line:#332e27;
+  --fg:#f2ede4; --muted:#a59d90; --gold:#d1ab64; --gold-ink:#14110c; --gold-soft:#3a2f1c;
+  --ok:#6cc08e; --warn:#e0a35a; --bad:#e2766c; --info:#8db0dd;
+  --st-prospecto:#d1ab64; --st-tramite:#8db0dd; --st-pregunto:#a59d90; --st-sinrespuesta:#e2766c; --st-cita:#6cc08e;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1240px;margin:0 auto}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;padding-block:14px 0;max-width:1240px;margin:0 auto}
+.brand{display:flex;flex-direction:column;gap:0;margin-right:auto}
+.brand b{font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.01em}
+.brand span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.today{color:var(--muted);font-size:13px}
+nav.tabs{display:flex;gap:4px;max-width:1240px;margin:8px auto 0;overflow-x:auto;scrollbar-width:none}
+nav.tabs a{padding:10px 14px;text-decoration:none;color:var(--muted);font-weight:600;font-size:13px;border-bottom:2px solid transparent;white-space:nowrap}
+nav.tabs a[aria-current="page"]{color:var(--fg);border-color:var(--gold)}
+nav.tabs a .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--gold);color:var(--gold-ink);font-size:11px;text-align:center}
+
+main{padding-top:24px}
+section.view{display:grid;gap:24px}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px}
+.h h2{font-family:var(--serif);font-weight:500;font-size:26px}
+.h .sub{color:var(--muted)}
+.h .acts{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;
+  font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;color:var(--fg);white-space:nowrap}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.empty{color:var(--muted);padding:18px;border:1px dashed var(--line);border-radius:var(--r);text-align:left}
+.empty b{color:var(--fg);display:block;margin-bottom:4px}
+
+/* pipeline strip */
+.pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stage-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;text-align:left;display:grid;gap:2px;border-top:3px solid var(--c)}
+.stage-tile:hover{border-color:var(--c)}
+.stage-tile .num{font-family:var(--serif);font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stage-tile .lbl{font-weight:600;font-size:13px}
+.stage-tile .hint{color:var(--muted);font-size:12px}
+@media (max-width:760px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}.pipe .stage-tile:last-child{grid-column:1/-1}}
+
+.two{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+
+/* lists */
+.list{display:grid;gap:0}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .who{min-width:0;flex:1 1 200px}
+.row .who b{display:block}
+.row .who small{color:var(--muted)}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:999px;
+  background:color-mix(in srgb,var(--c,var(--muted)) 14%,transparent);color:var(--c,var(--muted));white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.when{font-variant-numeric:tabular-nums;font-weight:600;min-width:84px}
+
+/* kanban */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar input,.toolbar select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.toolbar input{flex:1 1 200px;min-width:0}
+.kanban-scroll{overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:12px;min-width:1180px}
+.col{background:var(--surface-2);border-radius:var(--r);padding:10px;display:grid;gap:8px;align-content:start;scroll-snap-align:start;min-height:180px}
+.col.drop{outline:2px dashed var(--c)}
+.col-h{display:flex;align-items:center;gap:8px;padding:4px 4px 6px;border-bottom:2px solid var(--c)}
+.col-h b{font-size:13px}
+.col-h .n{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:6px;cursor:grab}
+.card .t{display:flex;gap:8px;align-items:start}
+.card .t b{flex:1;min-width:0;overflow-wrap:anywhere}
+.card .meta{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.card .foot{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.card select{font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);flex:1;min-width:0}
+.card.due{border-color:var(--warn)}
+.col-empty{color:var(--muted);font-size:12px;padding:8px 4px}
+
+/* calendar */
+.cal-h{display:flex;align-items:center;gap:8px}
+.cal-h b{font-family:var(--serif);font-size:20px;font-weight:500;text-transform:capitalize;min-width:170px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px}
+.cal .dow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:4px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:84px;padding:6px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
+.day.out{opacity:.4}
+.day.today{border-color:var(--gold)}
+.day.sel{outline:2px solid var(--gold)}
+.day .d{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.day .ev{font-size:11px;background:color-mix(in srgb,var(--st-cita) 16%,transparent);color:var(--st-cita);border-radius:4px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day .ev.x{text-decoration:line-through;opacity:.6}
+@media (max-width:640px){.day{min-height:52px}.day .ev{font-size:0;height:6px;padding:0;width:6px;border-radius:50%;background:var(--st-cita)}}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:2px}
+.kpi .v{font-family:var(--serif);font-size:30px;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .l{font-size:12px;color:var(--muted)}
+.net{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.net b{font-size:15px}
+.chart{width:100%;height:auto;display:block}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:12px;color:var(--muted)}
+.banner{border:1px solid var(--line);border-left:3px solid var(--warn);background:var(--surface);border-radius:8px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:100%;max-width:620px;padding:20px;display:grid;gap:14px}
+.modal h3{font-family:var(--serif);font-weight:500;font-size:22px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.grid2{grid-template-columns:minmax(0,1fr)}}
+label.f{display:grid;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+label.f input,label.f select,label.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-weight:500;color:var(--fg);width:100%}
+label.f textarea{min-height:80px;resize:vertical}
+.span2{grid-column:1/-1}
+.cita-box{border:1px solid var(--st-cita);border-radius:10px;padding:12px;display:grid;gap:12px}
+.ai{border:1px dashed var(--gold);border-radius:10px;padding:12px;display:grid;gap:8px}
+.ai textarea{min-height:90px}
+.mrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
+.mrow .left{margin-right:auto}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;z-index:30}
+.howto{font-size:13px;color:var(--muted)}
+.howto ol{margin:6px 0 0;padding-left:20px;display:grid;gap:4px}
+@media (prefers-reduced-motion:no-preference){.card,.stage-tile,.btn{transition:border-color .15s}}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+.login{min-height:80vh;display:grid;place-items:center}
+.login form{width:100%;max-width:380px;display:grid;gap:14px}
+.login h1{font-family:var(--serif);font-weight:500;font-size:30px}
+.msg-thread{display:grid;gap:6px;margin-top:6px}
+.bubble{background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}
+.bubble small{display:block;color:var(--muted);font-size:11px}
+.row.unread .who b::after{content:"Nuevo";margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="wrap login" id="loginView" hidden>
+  <form id="loginForm" class="panel">
+    <div class="eyebrow">Panel privado</div>
+    <h1>Tania Torres</h1>
+    <label class="f">Correo<input id="lg-email" type="email" autocomplete="username" required></label>
+    <label class="f">Contraseña<input id="lg-pass" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit" id="lg-btn">Entrar</button>
+    <p class="note" id="lg-msg" style="margin:0">Usa la misma cuenta del panel de administración de la página.</p>
+  </form>
+</div>
+
+<div id="app" hidden>
+<header class="top">
+  <div class="bar">
+    <div class="brand"><span>Asesora inmobiliaria</span><b>Tania Torres</b></div>
+    <div class="today" id="todayLbl"></div>
+    <button class="btn primary" id="btnNew" type="button">+ Nuevo prospecto</button>
+    <button class="btn ghost sm" id="btnLogout" type="button">Salir</button>
+  </div>
+  <nav class="tabs" aria-label="Secciones">
+    <a href="#hoy" data-tab="hoy">Hoy<span class="n" id="nDue" hidden></span></a>
+    <a href="#mensajes" data-tab="mensajes">Mensajes<span class="n" id="nInbox" hidden></span></a>
+    <a href="#prospectos" data-tab="prospectos">Prospectos</a>
+    <a href="#citas" data-tab="citas">Citas</a>
+    <a href="#redes" data-tab="redes">Redes</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="dbBanner" hidden></div>
+
+  <!-- HOY -->
+  <section class="view" id="v-hoy">
+    <div class="pipe" id="pipe"></div>
+    <div class="two">
+      <div class="panel">
+        <div class="h"><h2>Pendientes</h2><span class="sub">Seguimientos vencidos, chats sin respuesta y citas de hoy y mañana</span></div>
+        <div class="list" id="dueList"></div>
+      </div>
+      <div class="panel">
+        <div class="h"><h2>Próximas citas</h2></div>
+        <div class="list" id="nextList"></div>
+      </div>
+    </div>
+    <div class="panel howto">
+      <div class="eyebrow">Cómo se llena este panel</div>
+      <ol>
+        <li>Los mensajes de Instagram y Facebook llegan solos a la pestaña <b>Mensajes</b> (vía ManyChat).</li>
+        <li>Con <b>Registrar</b> el chat pasa a Prospectos con su conversación en notas. Elige la etapa que le toca.</li>
+        <li>Si queda una cita, cámbialo a <b>Con cita</b>: se agenda en el calendario y puedes mandarla al Google Calendar de Tania con un clic.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- MENSAJES -->
+  <section class="view" id="v-mensajes" hidden>
+    <div class="h"><h2>Mensajes</h2><span class="sub">Instagram y Facebook, en cuanto llegan</span>
+      <div class="acts"><select id="fInbox" class="btn" aria-label="Mostrar">
+        <option value="nuevo">Sin registrar</option><option value="registrado">Registrados</option><option value="archivado">Archivados</option><option value="">Todos</option></select></div></div>
+    <div class="panel"><div class="list" id="inboxList"></div></div>
+    <p class="note">Aquí solo se leen. Para contestar, abre el chat en Instagram, Facebook o Business Suite.</p>
+  </section>
+
+  <!-- PROSPECTOS -->
+  <section class="view" id="v-prospectos" hidden>
+    <div class="h"><h2>Prospectos</h2><span class="sub" id="pCount"></span></div>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Buscar por nombre, teléfono o propiedad" aria-label="Buscar">
+      <select id="fCanal" aria-label="Canal"><option value="">Todos los canales</option></select>
+      <select id="fInteres" aria-label="Interés"><option value="">Todo interés</option></select>
+    </div>
+    <div class="kanban-scroll"><div class="kanban" id="kanban"></div></div>
+    <p class="note">Arrastra una tarjeta a otra columna o cambia su etapa con el selector.</p>
+  </section>
+
+  <!-- CITAS -->
+  <section class="view" id="v-citas" hidden>
+    <div class="h"><h2>Citas</h2><span class="sub">Visitas agendadas con Tania</span>
+      <div class="acts"><button class="btn primary" type="button" id="btnNewAppt">+ Nueva cita</button></div></div>
+    <div class="two">
+      <div class="panel">
+        <div class="cal-h">
+          <button class="btn sm ghost" type="button" id="calPrev" aria-label="Mes anterior">‹</button>
+          <b id="calLbl"></b>
+          <button class="btn sm ghost" type="button" id="calNext" aria-label="Mes siguiente">›</button>
+          <button class="btn sm ghost" type="button" id="calToday" style="margin-left:auto">Hoy</button>
+        </div>
+        <div class="cal" id="cal"></div>
+      </div>
+      <div class="panel">
+        <div class="h"><h2 id="dayLbl">Día</h2></div>
+        <div class="list" id="dayList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REDES -->
+  <section class="view" id="v-redes" hidden>
+    <div class="h"><h2>Redes sociales</h2><span class="sub">Estadísticas de Instagram y Facebook</span></div>
+    <div class="panel" style="display:grid;gap:12px">
+      <p style="margin:0">Las estadísticas en vivo se ven en Metricool y en el panel de Claude, que ya las trae conectadas.</p>
+      <div class="mrow" style="justify-content:flex-start">
+        <a class="btn primary" href="https://app.metricool.com" target="_blank" rel="noopener">Abrir Metricool</a>
+        <a class="btn" href="https://claude.ai/artifact/5bcZaW6XRGUKKG1vrfTMpm" target="_blank" rel="noopener">Estadísticas en el panel de Claude</a>
+        <a class="btn" href="https://business.facebook.com/latest/insights/" target="_blank" rel="noopener">Meta Business Suite</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast" hidden></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const fbApp = initializeApp({
+  apiKey: "AIzaSyDvmuiSmFS_UJxXmUkHwfybVoAvtf4nt44",
+  authDomain: "tania-torres-web.firebaseapp.com",
+  projectId: "tania-torres-web",
+  storageBucket: "tania-torres-web.firebasestorage.app",
+  messagingSenderId: "594542001889",
+  appId: "1:594542001889:web:7badbbcb0813db165101a0"
+});
+const auth = getAuth(fbApp), fdb = getFirestore(fbApp);
+// Misma forma que usaba el panel de Claude: db.collection(x).doc(id).set/update/delete y onSnapshot
+const fsStore = { collection(name){ return {
+  doc(id){ const r = id ? doc(fdb, name, id) : doc(collection(fdb, name)); return {id:r.id, set:d => setDoc(r, d), update:d => updateDoc(r, d), delete:() => deleteDoc(r)}; },
+  onSnapshot(next, err){ return onSnapshot(collection(fdb, name), s => next({docs:s.docs.map(d => ({id:d.id, data:() => d.data()}))}), err); }
+}; } };
+
+const TZ = "America/Mexico_City";
+const STAGES = [
+  {id:"prospecto",   label:"Prospecto",     hint:"Quiere comprar o vender"},
+  {id:"tramite",     label:"Solo trámite",  hint:"Busca ayuda con un trámite o crédito"},
+  {id:"pregunto",    label:"Solo preguntó", hint:"Pidió información, sin interés claro"},
+  {id:"sinrespuesta",label:"Sin respuesta", hint:"Dejó de contestar"},
+  {id:"cita",        label:"Con cita",      hint:"Tiene visita agendada"}
+];
+const STAGE = Object.fromEntries(STAGES.map(s => [s.id, s]));
+const CANALES = ["Instagram","Facebook","WhatsApp","Página web","Referido","Otro"];
+const INTERES = ["Comprar","Vender","Rentar","Crédito / trámite","Otro"];
+const APPT_STATUS = {programada:"Programada", realizada:"Realizada", cancelada:"Cancelada"};
+const METRICOOL = "Metricool Social Media Management";
+const BRAND_ID = "7531561";
+
+let db = null, prospects = [], appts = [], canWrite = true, loaded = {p:false, a:false, i:false};
+
+/* ---------- utilities ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2, "0");
+function todayStr(offsetDays = 0){
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"})
+    .formatToParts(new Date(Date.now() + offsetDays*864e5)).map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+function addDays(ymd, n){ const d = new Date(ymd + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0,10); }
+function daysBetween(a, b){ return Math.round((new Date(b+"T12:00:00Z") - new Date(a+"T12:00:00Z")) / 864e5); }
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+function niceDate(ymd, withDow = true){
+  if(!ymd) return "";
+  const d = new Date(ymd + "T12:00:00Z");
+  const t = todayStr();
+  if(ymd === t) return "hoy";
+  if(ymd === addDays(t,1)) return "mañana";
+  if(ymd === addDays(t,-1)) return "ayer";
+  return (withDow ? DIAS[d.getUTCDay()] + " " : "") + d.getUTCDate() + " de " + MESES[d.getUTCMonth()];
+}
+function niceTime(hm){ if(!hm) return ""; const [h,m] = hm.split(":").map(Number); const ap = h >= 12 ? "pm" : "am"; return ((h % 12) || 12) + ":" + pad(m) + " " + ap; }
+function digits(p){ return String(p||"").replace(/\D/g,""); }
+function waLink(phone, text){
+  let d = digits(phone); if(!d) return "";
+  if(d.length === 10) d = "52" + d;
+  return "https://wa.me/" + d + (text ? "?text=" + encodeURIComponent(text) : "");
+}
+function fmtPhone(p){ const d = digits(p).slice(-10); return d.length === 10 ? d.slice(0,2)+" "+d.slice(2,6)+" "+d.slice(6) : (p||""); }
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2600); }
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); toast("Copiado"); }
+  catch { showCopyFallback(text); }
+}
+function showCopyFallback(text){
+  openModal(`<h3>Copia el mensaje</h3><label class="f">Selecciona y copia<textarea id="cpTxt" readonly>${esc(text)}</textarea></label>
+    <div class="mrow"><button class="btn" type="button" data-close>Cerrar</button></div>`);
+  const ta = $("#cpTxt"); ta.focus(); ta.select();
+}
+const firstName = n => String(n||"").trim().split(/\s+/)[0] || "";
+const msgSeguimiento = p => `Hola, ${firstName(p.name)}. Te escribo para saber si te sigue interesando ${p.property ? "la casa en " + p.property : "la casa que viste"}. Si quieres, te comparto horarios para que la conozcas esta semana.`;
+const msgCita = a => `Listo, tu visita queda agendada para el ${niceDate(a.date)} a las ${niceTime(a.time)}${a.property ? " en " + a.property : ""}. Te mando la ubicación exacta un día antes. Si se te presenta algo, avísame por aquí para moverla sin problema.`;
+function gcalLink(a){
+  const start = a.date.replace(/-/g,"") + "T" + a.time.replace(":","") + "00";
+  const endD = new Date(`${a.date}T${a.time}:00Z`); endD.setUTCMinutes(endD.getUTCMinutes() + (Number(a.duration) || 60));
+  const end = endD.toISOString().slice(0,19).replace(/[-:]/g,"");
+  const q = new URLSearchParams({
+    action:"TEMPLATE",
+    text:`Visita: ${a.name}${a.property ? " · " + a.property : ""}`,
+    dates:`${start}/${end}`,
+    ctz:TZ,
+    details:[a.phone ? "Tel: " + fmtPhone(a.phone) : "", a.notes || "", "Agendada desde el Panel Tania Torres"].filter(Boolean).join("\n"),
+    location:a.location || a.property || ""
+  });
+  return "https://calendar.google.com/calendar/render?" + q.toString();
+}
+
+/* ---------- tabs ---------- */
+const TABS = ["hoy","mensajes","prospectos","citas","redes"];
+function showTab(t){
+  if(!TABS.includes(t)) t = "hoy";
+  TABS.forEach(x => { $("#v-"+x).hidden = x !== t; });
+  document.querySelectorAll("nav.tabs a").forEach(a => { if(a.dataset.tab === t) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if(t === "redes") startStats();
+}
+document.querySelectorAll("nav.tabs a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); showTab(a.dataset.tab); try{ history.replaceState(null,"","#"+a.dataset.tab); }catch{} }));
+
+/* ---------- derived ---------- */
+function apptsFor(pid){ return appts.filter(a => a.prospectId === pid); }
+function dueItems(){
+  const t = todayStr(), tm = addDays(t,1), out = [];
+  for(const p of prospects){
+    if(p.nextFollowUp && p.nextFollowUp <= t && p.stage !== "cita"){
+      out.push({kind:"seg", p, sort:"0"+p.nextFollowUp, reason: p.nextFollowUp < t ? "Seguimiento vencido " + niceDate(p.nextFollowUp,false) : "Seguimiento hoy", c:"var(--warn)"});
+    } else if(p.stage === "sinrespuesta" && (!p.nextFollowUp) && p.lastContact && daysBetween(p.lastContact, t) >= 2){
+      out.push({kind:"seg", p, sort:"1"+p.lastContact, reason:`Sin respuesta desde ${niceDate(p.lastContact,false)}`, c:"var(--st-sinrespuesta)"});
+    }
+  }
+  for(const a of appts){
+    if(a.status === "programada" && (a.date === t || a.date === tm)){
+      out.push({kind:"cita", a, sort:"2"+a.date+a.time, reason:`Cita ${niceDate(a.date)} ${niceTime(a.time)}`, c:"var(--st-cita)"});
+    }
+  }
+  return out.sort((x,y) => x.sort.localeCompare(y.sort));
+}
+
+/* ---------- render: hoy ---------- */
+function renderHoy(){
+  const counts = Object.fromEntries(STAGES.map(s => [s.id, 0]));
+  prospects.forEach(p => { if(counts[p.stage] != null) counts[p.stage]++; });
+  $("#pipe").innerHTML = STAGES.map(s => `<button class="stage-tile" type="button" data-stage="${s.id}" style="--c:var(--st-${s.id})">
+      <span class="num">${counts[s.id]}</span><span class="lbl">${esc(s.label)}</span><span class="hint">${esc(s.hint)}</span></button>`).join("");
+
+  const due = dueItems();
+  const nb = $("#nDue"); nb.hidden = !due.length; nb.textContent = due.length;
+  $("#dueList").innerHTML = !loaded.p ? `<div class="empty">Cargando…</div>` : due.length ? due.map(it => {
+    if(it.kind === "cita"){ const a = it.a;
+      return `<div class="row"><div class="who"><b>${esc(a.name)}</b><small>${esc(a.property || "Sin propiedad")}</small></div>
+        <span class="chip" style="--c:${it.c}">${esc(it.reason)}</span>
+        <div class="acts">${a.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(a.phone, msgCita(a)))}">WhatsApp</a>` : ""}
+        <a class="btn sm" target="_blank" rel="noopener" href="${esc(gcalLink(a))}">Google Calendar</a></div></div>`;
+    }
+    const p = it.p;
+    return `<div class="row"><div class="who"><b>${esc(p.name)}</b><small>${esc([p.interest, p.property, p.channel].filter(Boolean).join(" · "))}</small></div>
+      <span class="chip" style="--c:${it.c}">${esc(it.reason)}</span>
+      <div class="acts">${p.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(p.phone, msgSeguimiento(p)))}">WhatsApp</a>` : `<button class="btn sm" type="button" data-copy-seg="${esc(p.id)}">Copiar mensaje</button>`}
+      <button class="btn sm" type="button" data-done="${esc(p.id)}" ${canWrite ? "" : "disabled"}>Contactado</button>
+      <button class="btn sm ghost" type="button" data-edit="${esc(p.id)}">Abrir</button></div></div>`;
+  }).join("") : `<div class="empty"><b>Todo al día</b>Aquí aparecen los seguimientos que tocan hoy, los chats que dejaron de contestar hace 2 días o más y las citas de hoy y mañana.</div>`;
+
+  const t = todayStr();
+  const next = appts.filter(a => a.status === "programada" && a.date >= t).sort((x,y) => (x.date+x.time).localeCompare(y.date+y.time)).slice(0,6);
+  $("#nextList").innerHTML = !loaded.a ? `<div class="empty">Cargando…</div>` : next.length ? next.map(a => `<div class="row">
+      <span class="when">${esc(niceDate(a.date,false))}<br><small style="color:var(--muted);font-weight:500">${esc(niceTime(a.time))}</small></span>
+      <div class="who"><b>${esc(a.name)}</b><small>${esc(a.property || "")}</small></div>
+      <a class="btn sm" target="_blank" rel="noopener" href="${esc(gcalLink(a))}">Google Calendar</a></div>`).join("")
+    : `<div class="empty"><b>Sin citas próximas</b>Cuando pases un prospecto a "Con cita", la visita aparece aquí.</div>`;
+}
+
+/* ---------- render: kanban ---------- */
+function renderKanban(){
+  const q = $("#q").value.trim().toLowerCase(), fc = $("#fCanal").value, fi = $("#fInteres").value, t = todayStr();
+  const list = prospects.filter(p => (!fc || p.channel === fc) && (!fi || p.interest === fi) &&
+    (!q || [p.name, p.phone, p.property, p.notes].join(" ").toLowerCase().includes(q)));
+  $("#pCount").textContent = prospects.length ? `${prospects.length} en total` : "";
+  $("#kanban").innerHTML = STAGES.map(s => {
+    const items = list.filter(p => p.stage === s.id).sort((a,b) => String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
+    return `<div class="col" data-col="${s.id}" style="--c:var(--st-${s.id})">
+      <div class="col-h"><span class="chip" style="--c:var(--st-${s.id})">${esc(s.label)}</span><span class="n">${items.length}</span></div>
+      ${items.length ? items.map(p => card(p, t)).join("") : `<div class="col-empty">${loaded.p ? (prospects.length ? "Nada con este filtro" : esc(s.hint)) : "Cargando…"}</div>`}
+    </div>`;
+  }).join("");
+}
+function card(p, t){
+  const due = p.nextFollowUp && p.nextFollowUp <= t && p.stage !== "cita";
+  const ap = apptsFor(p.id).filter(a => a.status === "programada" && a.date >= t).sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time))[0];
+  return `<div class="card${due ? " due" : ""}" draggable="${canWrite}" data-id="${esc(p.id)}">
+    <div class="t"><b>${esc(p.name)}</b>${p.interest ? `<span class="chip">${esc(p.interest)}</span>` : ""}</div>
+    ${p.property ? `<div class="meta">${esc(p.property)}</div>` : ""}
+    <div class="meta">${esc([p.channel, p.phone ? fmtPhone(p.phone) : ""].filter(Boolean).join(" · "))}</div>
+    ${ap ? `<div class="meta" style="color:var(--st-cita)">Cita ${esc(niceDate(ap.date))} ${esc(niceTime(ap.time))}</div>` :
+      p.nextFollowUp ? `<div class="meta" style="${due ? "color:var(--warn)" : ""}">Seguimiento ${esc(niceDate(p.nextFollowUp))}</div>` : ""}
+    <div class="foot">
+      <select aria-label="Etapa de ${esc(p.name)}" data-stage-of="${esc(p.id)}" ${canWrite ? "" : "disabled"}>${STAGES.map(s => `<option value="${s.id}"${s.id===p.stage?" selected":""}>${esc(s.label)}</option>`).join("")}</select>
+      ${p.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(p.phone))}">WA</a>` : ""}
+      <button class="btn sm ghost" type="button" data-edit="${esc(p.id)}">Editar</button>
+    </div></div>`;
+}
+
+/* ---------- render: calendar ---------- */
+let calMonth = todayStr().slice(0,7), selDay = todayStr();
+function renderCal(){
+  const [y, m] = calMonth.split("-").map(Number);
+  $("#calLbl").textContent = MESES[m-1] + " " + y;
+  const first = new Date(Date.UTC(y, m-1, 1));
+  const startOffset = (first.getUTCDay() + 6) % 7; // semana inicia en lunes
+  const start = addDays(`${y}-${pad(m)}-01`, -startOffset);
+  const t = todayStr();
+  let html = ["lun","mar","mié","jue","vie","sáb","dom"].map(d => `<div class="dow">${d}</div>`).join("");
+  for(let i = 0; i < 42; i++){
+    const d = addDays(start, i);
+    if(i >= 35 && d.slice(0,7) !== calMonth) break;
+    const evs = appts.filter(a => a.date === d).sort((a,b) => a.time.localeCompare(b.time));
+    html += `<button type="button" class="day${d.slice(0,7)!==calMonth?" out":""}${d===t?" today":""}${d===selDay?" sel":""}" data-day="${d}" aria-label="${esc(niceDate(d))}, ${evs.length} citas">
+      <span class="d">${Number(d.slice(8))}</span>
+      ${evs.slice(0,3).map(a => `<span class="ev${a.status==="cancelada"?" x":""}">${esc(niceTime(a.time).replace(" ",""))} ${esc(firstName(a.name))}</span>`).join("")}
+      ${evs.length > 3 ? `<span class="note">+${evs.length-3}</span>` : ""}</button>`;
+  }
+  $("#cal").innerHTML = html;
+  renderDay();
+}
+function renderDay(){
+  $("#dayLbl").textContent = niceDate(selDay).replace(/^./, c => c.toUpperCase());
+  const evs = appts.filter(a => a.date === selDay).sort((a,b) => a.time.localeCompare(b.time));
+  $("#dayList").innerHTML = evs.length ? evs.map(a => `<div class="row" style="align-items:flex-start">
+      <span class="when">${esc(niceTime(a.time))}</span>
+      <div class="who"><b>${esc(a.name)}</b><small>${esc([a.property, a.phone ? fmtPhone(a.phone) : ""].filter(Boolean).join(" · "))}</small>
+        ${a.notes ? `<small style="display:block">${esc(a.notes)}</small>` : ""}</div>
+      <div class="acts" style="flex-basis:100%">
+        <select class="btn sm" data-status-of="${esc(a.id)}" aria-label="Estado de la cita" ${canWrite ? "" : "disabled"}>${Object.entries(APPT_STATUS).map(([k,v]) => `<option value="${k}"${k===a.status?" selected":""}>${v}</option>`).join("")}</select>
+        <a class="btn sm" target="_blank" rel="noopener" href="${esc(gcalLink(a))}">Google Calendar</a>
+        ${a.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(a.phone, msgCita(a)))}">Confirmar por WhatsApp</a>` : `<button class="btn sm" type="button" data-copy-cita="${esc(a.id)}">Copiar confirmación</button>`}
+        <button class="btn sm ghost" type="button" data-edit-appt="${esc(a.id)}">Editar</button>
+      </div></div>`).join("")
+    : `<div class="empty"><b>Sin citas este día</b>Agrega una con <b>+ Nueva cita</b> o pasando un prospecto a "Con cita".</div>`;
+}
+
+function renderAll(){ renderHoy(); renderKanban(); renderCal(); if(typeof renderInbox === "function" && loaded.i) renderInbox(); }
+
+/* ---------- modal ---------- */
+function openModal(html){
+  $("#modalRoot").innerHTML = `<div class="scrim" id="scrim"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
+  $("#scrim").addEventListener("click", e => { if(e.target.id === "scrim" || e.target.closest("[data-close]")) closeModal(); });
+  const f = $("#modalRoot").querySelector("input,select,textarea"); if(f) f.focus();
+}
+function closeModal(){ $("#modalRoot").innerHTML = ""; }
+document.addEventListener("keydown", e => { if(e.key === "Escape" && $("#scrim")) closeModal(); });
+
+const opt = (arr, v) => arr.map(x => `<option${x===v?" selected":""}>${esc(x)}</option>`).join("");
+
+let sampleFn = null;
+let pendingInboxId = null;
+function prospectForm(p, prefill){
+  const isNew = !p;
+  pendingInboxId = prefill?.inboxId || null;
+  p = p || {stage:"prospecto", channel:"Instagram", interest:"Comprar", ...(prefill || {})};
+  const ap = !isNew ? apptsFor(p.id).filter(a => a.status === "programada").sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)).slice(-1)[0] : null;
+  openModal(`<h3>${isNew ? "Nuevo prospecto" : esc(p.name)}</h3>
+    ${isNew && sampleFn ? `<div class="ai"><div class="eyebrow">Llenar con IA</div>
+      <label class="f">Pega aquí la conversación de Instagram, Facebook o WhatsApp<textarea id="aiTxt" placeholder="Ej. Hola, vi la casa de Viande, ¿acepta Infonavit? Me llamo Laura, mi cel es 33..."></textarea></label>
+      <div class="mrow"><span class="note left" id="aiMsg">La IA sugiere los datos y la etapa. Revísalos antes de guardar.</span><button class="btn" type="button" id="aiBtn">Clasificar</button></div></div>` : ""}
+    <form id="pf" class="grid2" autocomplete="off">
+      <label class="f">Nombre<input id="f-name" required value="${esc(p.name||"")}"></label>
+      <label class="f">Teléfono (WhatsApp)<input id="f-phone" inputmode="tel" value="${esc(p.phone||"")}" placeholder="33 1234 5678"></label>
+      <label class="f">Canal<select id="f-channel">${opt(CANALES, p.channel)}</select></label>
+      <label class="f">Interés<select id="f-interest">${opt(INTERES, p.interest)}</select></label>
+      <label class="f span2">Propiedad o zona de interés<input id="f-property" value="${esc(p.property||"")}" placeholder="Ej. Viande, Tlaquepaque"></label>
+      <label class="f">Etapa<select id="f-stage">${STAGES.map(s => `<option value="${s.id}"${s.id===p.stage?" selected":""}>${esc(s.label)}</option>`).join("")}</select></label>
+      <label class="f">Próximo seguimiento<input id="f-next" type="date" value="${esc(p.nextFollowUp||"")}"></label>
+      <div class="cita-box span2" id="citaBox" hidden>
+        <div class="eyebrow" style="color:var(--st-cita)">Datos de la cita</div>
+        <div class="grid2">
+          <label class="f">Fecha<input id="c-date" type="date" value="${esc(ap?.date||addDays(todayStr(),1))}"></label>
+          <label class="f">Hora<input id="c-time" type="time" step="900" value="${esc(ap?.time||"11:00")}"></label>
+          <label class="f">Duración<select id="c-dur">${[30,45,60,90].map(n => `<option value="${n}"${n===(ap?.duration||60)?" selected":""}>${n} min</option>`).join("")}</select></label>
+          <label class="f">Lugar (opcional)<input id="c-loc" value="${esc(ap?.location||"")}" placeholder="Dirección o punto de encuentro"></label>
+        </div>
+      </div>
+      <label class="f span2">Notas<textarea id="f-notes" placeholder="Qué busca, presupuesto, tipo de crédito, qué se le respondió">${esc(p.notes||"")}</textarea></label>
+      <div class="mrow span2">
+        ${!isNew ? `<span class="left" id="delWrap"><button class="btn sm ghost danger" type="button" id="delBtn">Eliminar</button></span>` : ""}
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" type="submit" ${canWrite ? "" : "disabled"}>Guardar</button>
+      </div>
+    </form>`);
+  const syncCita = () => { $("#citaBox").hidden = $("#f-stage").value !== "cita"; };
+  $("#f-stage").addEventListener("change", syncCita); syncCita();
+  $("#pf").addEventListener("submit", e => { e.preventDefault(); saveProspect(isNew ? null : p, ap); });
+  if(!isNew) $("#delBtn").addEventListener("click", () => {
+    $("#delWrap").innerHTML = `<span class="note">¿Eliminar a ${esc(p.name)} y sus citas?</span> <button class="btn sm danger" type="button" id="delYes">Sí, eliminar</button>`;
+    $("#delYes").addEventListener("click", () => deleteProspect(p));
+  });
+  if(isNew && sampleFn) $("#aiBtn").addEventListener("click", runAI);
+}
+
+async function runAI(){
+  const txt = $("#aiTxt").value.trim(); const msg = $("#aiMsg"), btn = $("#aiBtn");
+  if(!txt){ msg.textContent = "Pega primero la conversación."; return; }
+  btn.disabled = true; msg.textContent = "Leyendo la conversación…";
+  const prompt = `Eres asistente de Tania Torres, asesora inmobiliaria en Guadalajara (Zapopan, Tlajomulco, Tlaquepaque, Tonalá).
+Lee esta conversación de un cliente y devuelve SOLO un objeto JSON con estas claves:
+"name" (nombre del cliente o "" si no aparece), "phone" (teléfono si aparece, solo dígitos, o ""),
+"interest" (uno de: ${INTERES.map(x=>`"${x}"`).join(", ")}),
+"property" (casa, fraccionamiento o zona que menciona, o ""),
+"stage" (uno de: "prospecto" = quiere comprar o vender de verdad; "tramite" = solo quiere ayuda con un trámite o crédito; "pregunto" = solo pidió información sin interés claro; "sinrespuesta" = se le contestó y ya no respondió; "cita" = ya quedó una visita con fecha),
+"date" (fecha de la cita en formato AAAA-MM-DD si quedó una, si no ""; hoy es ${todayStr()}),
+"time" (hora de la cita HH:MM en 24 h, o ""),
+"notes" (resumen de 1 o 2 frases en español de México: qué busca, presupuesto, crédito, qué falta responder).
+No inventes datos que no estén en la conversación.
+
+Conversación:
+"""${txt.slice(0, 6000)}"""`;
+  try{
+    const r = await sampleFn.json(prompt, {modelTier:"quick"});
+    const set = (id, v) => { if(v) $(id).value = v; };
+    set("#f-name", r.name); set("#f-phone", r.phone); set("#f-property", r.property); set("#f-notes", r.notes);
+    if(INTERES.includes(r.interest)) $("#f-interest").value = r.interest;
+    if(STAGE[r.stage]) { $("#f-stage").value = r.stage; $("#f-stage").dispatchEvent(new Event("change")); }
+    if(r.date) $("#c-date").value = r.date; if(r.time) $("#c-time").value = r.time;
+    const ch = /instagram|\big\b/i.test(txt) ? "Instagram" : null; if(ch) $("#f-channel").value = ch;
+    msg.textContent = `Sugerencia: ${STAGE[r.stage]?.label || "sin etapa"}. Revisa y guarda.`;
+  }catch(e){
+    msg.textContent = e?.code === "rate_limited" ? "Demasiadas consultas seguidas. Espera un momento." :
+      e?.code === "not_granted" ? "La IA no tiene permiso en esta vista. Llena los datos a mano." : "No se pudo clasificar. Llena los datos a mano.";
+  }finally{ btn.disabled = false; }
+}
+
+async function saveProspect(old, oldAppt){
+  if(!db) return toast("El panel no está conectado a su base de datos");
+  const v = id => $(id).value.trim();
+  const now = new Date().toISOString(), t = todayStr();
+  const data = {
+    name: v("#f-name"), phone: digits(v("#f-phone")), channel: v("#f-channel"), interest: v("#f-interest"),
+    property: v("#f-property"), stage: v("#f-stage"), nextFollowUp: v("#f-next"), notes: v("#f-notes"),
+    updatedAt: now, lastContact: old?.lastContact || t, createdAt: old?.createdAt || now
+  };
+  if(!data.name) return toast("Escribe el nombre");
+  if(!old && !data.nextFollowUp && data.stage !== "cita") data.nextFollowUp = addDays(t, 2);
+  try{
+    let id = old?.id;
+    if(old) await db.collection("prospects").doc(id).set(data);
+    else { const ref = db.collection("prospects").doc(); id = ref.id; await ref.set(data); }
+    if(!old && pendingInboxId){ await db.collection("inbox").doc(pendingInboxId).update({status:"registrado", prospectId:id}); pendingInboxId = null; }
+    if(data.stage === "cita"){
+      const ad = {prospectId:id, name:data.name, phone:data.phone, property:data.property,
+        date:v("#c-date"), time:v("#c-time") || "11:00", duration:Number(v("#c-dur"))||60, location:v("#c-loc"),
+        status:"programada", notes:data.notes, updatedAt:now, createdAt:oldAppt?.createdAt || now};
+      if(!ad.date) return toast("Falta la fecha de la cita");
+      if(oldAppt) await db.collection("appointments").doc(oldAppt.id).set(ad);
+      else await db.collection("appointments").doc().set(ad);
+      closeModal(); selDay = ad.date; calMonth = ad.date.slice(0,7);
+      toast("Cita guardada. Agrégala al Google Calendar de Tania");
+      openGcalPrompt(ad);
+      return;
+    }
+    closeModal(); toast("Guardado");
+  }catch(e){ handleWriteError(e); }
+}
+function openGcalPrompt(a){
+  openModal(`<h3>Cita agendada</h3>
+    <p style="margin:0">${esc(a.name)} · ${esc(niceDate(a.date))} a las ${esc(niceTime(a.time))}${a.property ? " · " + esc(a.property) : ""}</p>
+    <div class="mrow" style="justify-content:flex-start">
+      <a class="btn primary" target="_blank" rel="noopener" href="${esc(gcalLink(a))}">Agregar a Google Calendar</a>
+      ${a.phone ? `<a class="btn" target="_blank" rel="noopener" href="${esc(waLink(a.phone, msgCita(a)))}">Confirmar por WhatsApp</a>` : `<button class="btn" type="button" id="cpC">Copiar confirmación</button>`}
+      <button class="btn ghost" type="button" data-close>Listo</button></div>
+    <p class="note" style="margin:0">Abre Google Calendar con la sesión de Tania (torresvivartania@gmail.com) para que la cita quede en su calendario.</p>`);
+  const b = $("#cpC"); if(b) b.addEventListener("click", () => copy(msgCita(a)));
+}
+async function deleteProspect(p){
+  try{
+    for(const a of apptsFor(p.id)) await db.collection("appointments").doc(a.id).delete();
+    await db.collection("prospects").doc(p.id).delete();
+    closeModal(); toast("Eliminado");
+  }catch(e){ handleWriteError(e); }
+}
+async function setStage(id, stage){
+  const p = prospects.find(x => x.id === id); if(!p || p.stage === stage) return;
+  if(stage === "cita"){ prospectForm({...p, stage:"cita"}); $("#f-stage").value = "cita"; $("#f-stage").dispatchEvent(new Event("change")); return; }
+  try{ await db.collection("prospects").doc(id).update({stage, updatedAt:new Date().toISOString()}); toast("Movido a " + STAGE[stage].label); }
+  catch(e){ handleWriteError(e); renderKanban(); }
+}
+async function markContacted(id){
+  try{ const t = todayStr(); await db.collection("prospects").doc(id).update({lastContact:t, nextFollowUp:addDays(t,3), updatedAt:new Date().toISOString()}); toast("Listo. Próximo seguimiento en 3 días"); }
+  catch(e){ handleWriteError(e); }
+}
+
+function apptForm(a){
+  const isNew = !a; a = a || {date:selDay, time:"11:00", duration:60, status:"programada"};
+  openModal(`<h3>${isNew ? "Nueva cita" : "Editar cita"}</h3>
+    <form id="af" class="grid2" autocomplete="off">
+      ${isNew ? `<label class="f span2">Prospecto<select id="a-pid"><option value="">Escribir datos nuevos</option>${prospects.slice().sort((x,y)=>x.name.localeCompare(y.name)).map(p => `<option value="${esc(p.id)}">${esc(p.name)}${p.property ? " · " + esc(p.property) : ""}</option>`).join("")}</select></label>` : ""}
+      <label class="f">Nombre<input id="a-name" required value="${esc(a.name||"")}"></label>
+      <label class="f">Teléfono<input id="a-phone" inputmode="tel" value="${esc(a.phone||"")}"></label>
+      <label class="f span2">Propiedad<input id="a-property" value="${esc(a.property||"")}"></label>
+      <label class="f">Fecha<input id="a-date" type="date" required value="${esc(a.date)}"></label>
+      <label class="f">Hora<input id="a-time" type="time" step="900" required value="${esc(a.time)}"></label>
+      <label class="f">Duración<select id="a-dur">${[30,45,60,90].map(n => `<option value="${n}"${n===Number(a.duration)?" selected":""}>${n} min</option>`).join("")}</select></label>
+      <label class="f">Lugar (opcional)<input id="a-loc" value="${esc(a.location||"")}"></label>
+      <label class="f span2">Notas<textarea id="a-notes">${esc(a.notes||"")}</textarea></label>
+      <div class="mrow span2">
+        ${!isNew ? `<span class="left" id="adelWrap"><button class="btn sm ghost danger" type="button" id="adel">Eliminar</button></span>` : ""}
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" type="submit" ${canWrite ? "" : "disabled"}>Guardar</button>
+      </div></form>`);
+  if(isNew) $("#a-pid").addEventListener("change", e => {
+    const p = prospects.find(x => x.id === e.target.value);
+    $("#a-name").value = p?.name || ""; $("#a-phone").value = p?.phone || ""; $("#a-property").value = p?.property || "";
+  });
+  if(!isNew) $("#adel").addEventListener("click", () => {
+    $("#adelWrap").innerHTML = `<button class="btn sm danger" type="button" id="adelYes">Sí, eliminar cita</button>`;
+    $("#adelYes").addEventListener("click", async () => { try{ await db.collection("appointments").doc(a.id).delete(); closeModal(); toast("Cita eliminada"); }catch(e){ handleWriteError(e); } });
+  });
+  $("#af").addEventListener("submit", async e => {
+    e.preventDefault(); if(!db) return;
+    const v = id => $(id).value.trim(), now = new Date().toISOString();
+    const pid = isNew ? v("#a-pid") : (a.prospectId || "");
+    const ad = {prospectId:pid, name:v("#a-name"), phone:digits(v("#a-phone")), property:v("#a-property"), date:v("#a-date"), time:v("#a-time"),
+      duration:Number(v("#a-dur"))||60, location:v("#a-loc"), notes:v("#a-notes"), status:a.status||"programada", updatedAt:now, createdAt:a.createdAt||now};
+    try{
+      if(isNew) await db.collection("appointments").doc().set(ad); else await db.collection("appointments").doc(a.id).set(ad);
+      if(pid){ const p = prospects.find(x => x.id === pid); if(p && p.stage !== "cita") await db.collection("prospects").doc(pid).update({stage:"cita", updatedAt:now}); }
+      selDay = ad.date; calMonth = ad.date.slice(0,7);
+      closeModal(); if(isNew) openGcalPrompt(ad); else toast("Cita actualizada");
+    }catch(err){ handleWriteError(err); }
+  });
+}
+
+function handleWriteError(e){
+  if(e?.code === "permission-denied" || e?.code === "invalid_argument"){ canWrite = false; renderAll(); toast("Tu acceso a este panel es solo de lectura"); }
+  else if(e?.code === "quota_exceeded") toast("La base del panel está llena. Elimina prospectos viejos.");
+  else toast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-edit],[data-done],[data-stage],[data-day],[data-edit-appt],[data-copy-seg],[data-copy-cita]");
+  if(!el) return;
+  if(el.dataset.edit){ const p = prospects.find(x => x.id === el.dataset.edit); if(p) prospectForm(p); }
+  else if(el.dataset.done) markContacted(el.dataset.done);
+  else if(el.dataset.stage && el.classList.contains("stage-tile")){ showTab("prospectos"); try{history.replaceState(null,"","#prospectos");}catch{} document.querySelector(`[data-col="${el.dataset.stage}"]`)?.scrollIntoView({behavior:"smooth",inline:"start",block:"nearest"}); }
+  else if(el.dataset.day){ selDay = el.dataset.day; if(selDay.slice(0,7) !== calMonth) calMonth = selDay.slice(0,7); renderCal(); }
+  else if(el.dataset.editAppt){ const a = appts.find(x => x.id === el.dataset.editAppt); if(a) apptForm(a); }
+  else if(el.dataset.copySeg){ const p = prospects.find(x => x.id === el.dataset.copySeg); if(p) copy(msgSeguimiento(p)); }
+  else if(el.dataset.copyCita){ const a = appts.find(x => x.id === el.dataset.copyCita); if(a) copy(msgCita(a)); }
+});
+document.addEventListener("change", async e => {
+  const s = e.target;
+  if(s.dataset.stageOf) setStage(s.dataset.stageOf, s.value);
+  else if(s.dataset.statusOf){ try{ await db.collection("appointments").doc(s.dataset.statusOf).update({status:s.value, updatedAt:new Date().toISOString()}); toast("Cita " + APPT_STATUS[s.value].toLowerCase()); }catch(err){ handleWriteError(err); } }
+});
+["#q","#fCanal","#fInteres"].forEach(id => $(id).addEventListener("input", renderKanban));
+$("#fCanal").innerHTML += CANALES.map(c => `<option>${esc(c)}</option>`).join("");
+$("#fInteres").innerHTML += INTERES.map(c => `<option>${esc(c)}</option>`).join("");
+$("#btnNew").addEventListener("click", () => prospectForm(null));
+$("#btnNewAppt").addEventListener("click", () => apptForm(null));
+$("#calPrev").addEventListener("click", () => { const [y,m] = calMonth.split("-").map(Number); const d = new Date(Date.UTC(y,m-2,1)); calMonth = d.toISOString().slice(0,7); renderCal(); });
+$("#calNext").addEventListener("click", () => { const [y,m] = calMonth.split("-").map(Number); const d = new Date(Date.UTC(y,m,1)); calMonth = d.toISOString().slice(0,7); renderCal(); });
+$("#calToday").addEventListener("click", () => { selDay = todayStr(); calMonth = selDay.slice(0,7); renderCal(); });
+
+// drag & drop between columns (desktop)
+let dragId = null;
+document.addEventListener("dragstart", e => { const c = e.target.closest?.(".card"); if(c){ dragId = c.dataset.id; e.dataTransfer.effectAllowed = "move"; } });
+document.addEventListener("dragover", e => { const col = e.target.closest?.(".col"); if(col && dragId){ e.preventDefault(); document.querySelectorAll(".col.drop").forEach(x => x !== col && x.classList.remove("drop")); col.classList.add("drop"); } });
+document.addEventListener("drop", e => { const col = e.target.closest?.(".col"); document.querySelectorAll(".col.drop").forEach(x => x.classList.remove("drop")); if(col && dragId){ e.preventDefault(); setStage(dragId, col.dataset.col); } dragId = null; });
+document.addEventListener("dragend", () => { dragId = null; document.querySelectorAll(".col.drop").forEach(x => x.classList.remove("drop")); });
+
+/* ---------- mensajes (ManyChat) ---------- */
+let inbox = [];
+function ago(iso){
+  if(!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 6e4);
+  if(m < 1) return "ahora"; if(m < 60) return `hace ${m} min`; const h = Math.round(m/60); if(h < 24) return `hace ${h} h`;
+  const d = new Date(iso); return d.toLocaleDateString("es-MX",{timeZone:TZ, day:"numeric", month:"short"});
+}
+function renderInbox(){
+  const f = $("#fInbox").value;
+  const nuevos = inbox.filter(m => (m.status || "nuevo") === "nuevo").length;
+  const nb = $("#nInbox"); nb.hidden = !nuevos; nb.textContent = nuevos;
+  const list = inbox.filter(m => !f || (m.status || "nuevo") === f).sort((a,b) => String(b.lastAt||"").localeCompare(String(a.lastAt||"")));
+  $("#inboxList").innerHTML = !loaded.i ? `<div class="empty">Cargando…</div>` : list.length ? list.map(m => {
+    const p = m.prospectId ? prospects.find(x => x.id === m.prospectId) : null;
+    const msgs = (m.messages || []).slice(-4);
+    return `<div class="row${(m.status||"nuevo")==="nuevo" ? " unread" : ""}" style="align-items:flex-start">
+      <div class="who"><b>${esc(m.name || m.username || "Sin nombre")}</b>
+        <small>${esc([m.channel, m.username ? "@" + m.username : "", ago(m.lastAt)].filter(Boolean).join(" · "))}</small>
+        <div class="msg-thread">${msgs.map(x => `<div class="bubble">${esc(x.text)}<small>${esc(ago(x.at))}</small></div>`).join("")}</div></div>
+      <div class="acts">
+        ${p ? `<span class="chip" style="--c:var(--st-${esc(p.stage)})">${esc(STAGE[p.stage]?.label || "")}</span><button class="btn sm ghost" type="button" data-edit="${esc(p.id)}">Abrir</button>`
+            : `<button class="btn sm primary" type="button" data-reg="${esc(m.id)}" ${canWrite ? "" : "disabled"}>Registrar</button>`}
+        ${(m.status||"nuevo") !== "archivado" ? `<button class="btn sm ghost" type="button" data-arch="${esc(m.id)}" ${canWrite ? "" : "disabled"}>Archivar</button>` : ""}
+      </div></div>`;
+  }).join("") : `<div class="empty"><b>${inbox.length ? "Nada en esta vista" : "Aún no llegan mensajes"}</b>${inbox.length ? "" : "En cuanto ManyChat esté conectado, cada mensaje de Instagram y Facebook aparece aquí."}</div>`;
+}
+$("#fInbox").addEventListener("change", renderInbox);
+document.addEventListener("click", async e => {
+  const r = e.target.closest("[data-reg]"), a = e.target.closest("[data-arch]");
+  if(r){ const m = inbox.find(x => x.id === r.dataset.reg); if(!m) return;
+    const convo = (m.messages || []).map(x => "- " + x.text).join("\n");
+    prospectForm(null, {inboxId:m.id, name:m.name || m.username || "", channel:CANALES.includes(m.channel) ? m.channel : "Otro",
+      phone:m.phone || "", notes:(m.username ? "@" + m.username + "\n" : "") + convo}); }
+  if(a){ try{ await db.collection("inbox").doc(a.dataset.arch).update({status:"archivado"}); toast("Archivado"); }catch(err){ handleWriteError(err); } }
+});
+function startStats(){}
+
+/* ---------- boot ---------- */
+$("#todayLbl").textContent = niceDate(todayStr()) === "hoy" ? (() => { const d = new Date(todayStr()+"T12:00:00Z"); return DIAS[d.getUTCDay()].replace(/^./,c=>c.toUpperCase()) + " " + d.getUTCDate() + " de " + MESES[d.getUTCMonth()]; })() : "";
+renderAll();
+const initial = (location.hash || "#hoy").slice(1); showTab(initial);
+
+const ADMIN = "taniatorresvivar@gmail.com";
+let unsubs = [];
+onAuthStateChanged(auth, user => {
+  unsubs.forEach(u => u()); unsubs = [];
+  const ok = !!user && (user.email || "").toLowerCase() === ADMIN;
+  $("#loginView").hidden = ok; $("#app").hidden = !ok;
+  if(user && !ok){ $("#lg-msg").textContent = "Esa cuenta no tiene acceso al panel."; signOut(auth); }
+  if(!ok){ db = null; return; }
+  db = fsStore; canWrite = true; $("#dbBanner").hidden = true;
+  const onErr = e => dbDown(e?.code === "permission-denied" ? "Faltan las reglas de Firestore del panel. Publícalas en la consola de Firebase." : "Se perdió la conexión con la base de datos. Recarga la página.");
+  unsubs.push(db.collection("prospects").onSnapshot(s => { prospects = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.p = true; renderAll(); }, onErr));
+  unsubs.push(db.collection("appointments").onSnapshot(s => { appts = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.a = true; renderAll(); }, onErr));
+  unsubs.push(db.collection("inbox").onSnapshot(s => { inbox = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.i = true; renderInbox(); }, onErr));
+});
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); const btn = $("#lg-btn"); btn.disabled = true; $("#lg-msg").textContent = "Entrando…";
+  try{ await signInWithEmailAndPassword(auth, $("#lg-email").value.trim(), $("#lg-pass").value); }
+  catch(err){ $("#lg-msg").textContent = err?.code === "auth/too-many-requests" ? "Demasiados intentos. Espera unos minutos." : "Correo o contraseña incorrectos."; }
+  finally{ btn.disabled = false; }
+});
+$("#btnLogout").addEventListener("click", () => signOut(auth));
+function dbDown(msg){ const b = $("#dbBanner"); b.hidden = false; b.textContent = msg; loaded.p = loaded.a = loaded.i = true; canWrite = false; renderAll(); }
+</script>
+</body>
+</html>

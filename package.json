@@ -1,0 +1,9 @@
+{
+  "name": "tania-torres-web",
+  "private": true,
+  "description": "Sitio de Tania Torres. Página estática más la función /api/manychat para el panel.",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "firebase-admin": "12.7.0"
+  }
+}

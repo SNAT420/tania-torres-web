@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tania Torres | Asesora Inmobiliaria en Guadalajara</title>
+  <meta name="description" content="Compra o vende tu casa en Guadalajara, Zapopan, Tlajomulco, Tlaquepaque y Tonalá con Tania Torres. Acompañamiento completo, trámite de crédito Infonavit, Fovissste y bancario hasta la firma.">
+  <meta name="theme-color" content="#080810">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tania Torres | Asesora Inmobiliaria en Guadalajara">
+  <meta property="og:description" content="Compra o vende tu casa con acompañamiento completo, desde la primera visita hasta la firma.">
+  <meta property="og:image" content="/og-image.jpg">
+  <meta property="og:locale" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --card: #14142a;
+      --card-hover: #1a1a35;
+      --gold: #c9a96e;
+      --gold-light: #e4c98a;
+      --gold-dark: #a07840;
+      --text: #f0ede8;
+      --text-muted: #8a8a9a;
+      --text-dim: #5a5a6a;
+      --border: rgba(201,169,110,0.15);
+      --border-hover: rgba(201,169,110,0.4);
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ─── VENDER / CRÉDITOS / WHATSAPP FLOTANTE ─── */
+    #vender { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .sell-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3.5rem; align-items: start; }
+    .steps { display: grid; gap: 1rem; margin-top: 2rem; }
+    .step { display: flex; gap: 1.1rem; align-items: flex-start; padding: 1.1rem 1.25rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
+    .step-num { flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-family: 'Playfair Display', serif; font-size: 1rem; }
+    .step h4 { font-weight: 500; font-size: 1rem; margin-bottom: 0.25rem; }
+    .step p { color: var(--text-muted); font-size: 0.9rem; font-weight: 300; line-height: 1.6; }
+    .sell-form { background: var(--card); border: 1px solid var(--border-hover); border-radius: var(--radius-lg); padding: 2rem; }
+    .sell-form h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400; margin-bottom: 0.4rem; }
+    .sell-form > p { color: var(--text-muted); font-size: 0.9rem; font-weight: 300; margin-bottom: 1.5rem; line-height: 1.6; }
+    .sell-form select { width: 100%; }
+    .sell-note { color: var(--text-dim); font-size: 0.78rem; margin-top: 0.9rem; text-align: center; }
+    .credit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.5rem; }
+    .credit-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.6rem 1.4rem; transition: border-color .25s, transform .25s; }
+    .credit-card:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+    .credit-card h4 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem; }
+    .credit-card p { color: var(--text-muted); font-size: 0.88rem; font-weight: 300; line-height: 1.6; }
+    .credits-cta { text-align: center; margin-top: 2.5rem; }
+    .wa-float { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 900; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.45); transition: transform .2s; }
+    .wa-float:hover { transform: scale(1.07); }
+    .wa-float svg { width: 30px; height: 30px; fill: #fff; }
+    .footer-admin { background: none; border: none; color: var(--text-dim); font-size: 0.72rem; margin-top: 0.8rem; cursor: pointer; letter-spacing: .05em; }
+    .footer-admin:hover { color: var(--gold); }
+    @media (max-width: 900px) {
+      .sell-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .credit-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .credit-grid { grid-template-columns: 1fr; }
+      .sell-form { padding: 1.5rem; }
+    }
+
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(8,8,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-logo span { color: var(--text); font-weight: 300; font-size: 0.85rem; display: block; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .btn-admin-nav {
+      background: transparent;
+      border: 1px solid var(--border-hover);
+      color: var(--gold);
+      padding: 0.4rem 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      transition: all 0.2s;
+    }
+
+    .btn-admin-nav:hover { background: var(--gold); color: var(--bg); }
+
+    /* ─── HERO ─── */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,169,110,0.07) 0%, transparent 70%),
+                  linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a96e' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; padding: 2rem; }
+
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .hero h1 em { color: var(--gold); font-style: italic; }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+      margin-inline: auto;
+    }
+
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,169,110,0.3); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border-hover);
+      padding: 0.85rem 2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollAnim 1.5s ease-in-out infinite;
+    }
+
+    @keyframes scrollAnim {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(0.7); }
+    }
+
+    /* ─── SECTIONS ─── */
+    section { padding: 6rem 2.5rem; }
+
+    .section-label {
+      color: var(--gold);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 500px;
+      font-weight: 300;
+    }
+
+    .section-header { margin-bottom: 3rem; }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ─── ABOUT ─── */
+    #sobre-mi { background: var(--surface); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-img-wrap {
+      position: relative;
+    }
+
+    .about-img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .about-img-placeholder svg { opacity: 0.4; }
+
+    .about-photo-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-hover);
+      display: block;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.1);
+      filter: contrast(1.05) brightness(1.02);
+    }
+
+    .about-deco {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 200px;
+      height: 200px;
+      border: 1px solid var(--gold);
+      border-radius: var(--radius-lg);
+      opacity: 0.15;
+      z-index: -1;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .stat-label { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* ─── PROPERTIES ─── */
+    #propiedades { background: var(--bg); }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.4rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+
+    .props-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .prop-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .prop-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+      background: var(--card-hover);
+    }
+
+    .prop-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .prop-img-placeholder {
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(135deg, #1a1a30, #0f0f20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+    }
+
+    .prop-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+    }
+
+    .prop-badge.renta { background: #4a90d9; }
+
+    .prop-body { padding: 1.5rem; }
+
+    .prop-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .prop-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--text);
+    }
+
+    .prop-location {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .prop-features {
+      display: flex;
+      gap: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .prop-feat {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-dim);
+      grid-column: 1/-1;
+    }
+
+    .empty-state svg { opacity: 0.3; margin-bottom: 1rem; }
+
+    .empty-state p { font-size: 1rem; }
+
+    /* ─── REVIEWS ─── */
+    #opiniones { background: var(--surface); }
+
+    .reviews-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .reviews-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .review-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .review-card:hover { border-color: var(--border-hover); }
+
+    .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+
+    .reviewer-name { font-weight: 500; font-size: 0.95rem; }
+
+    .reviewer-date { color: var(--text-dim); font-size: 0.75rem; }
+
+    .stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.75rem; }
+
+    .review-comment { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+    /* ─── REVIEW FORM ─── */
+    .review-form-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+
+    .review-form-wrap h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .review-form-wrap p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.04);
+    }
+
+    .form-group textarea { min-height: 100px; }
+
+    .star-picker { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+
+    .star-pick {
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.15s;
+      color: var(--text-dim);
+    }
+
+    .star-pick:hover, .star-pick.sel { color: var(--gold); transform: scale(1.2); }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      padding: 0.85rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-submit:hover { background: var(--gold-light); }
+
+    /* ─── CONTACT ─── */
+    #contacto {
+      background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+      text-align: center;
+    }
+
+    .contact-cards {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+
+    .contact-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.5rem;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: var(--text);
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .contact-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(201,169,110,0.15);
+    }
+
+    .contact-card svg { margin-bottom: 0.75rem; }
+
+    .contact-card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 0.3rem; }
+
+    .contact-card-value { font-size: 1rem; color: var(--gold); font-weight: 500; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    footer .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px);
+      transition: transform 0.3s;
+      position: relative;
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 1;
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+    .modal-gallery { position: relative; }
+
+    .modal-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-img-placeholder {
+      width: 100%;
+      height: 320px;
+      background: linear-gradient(135deg, #1a1a30, #0f0f20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .gallery-btn {
+      pointer-events: all;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .gallery-btn:hover { background: var(--gold); color: var(--bg); }
+
+    .gallery-dots {
+      position: absolute;
+      bottom: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .gallery-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .gallery-dot.active { background: var(--gold); }
+
+    .modal-body { padding: 2rem; }
+
+    .modal-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      margin-bottom: 1rem;
+    }
+
+    .modal-badge.renta { background: #4a90d9; }
+
+    .modal-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-location {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-feat {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .modal-feat-val { font-size: 1.2rem; font-weight: 600; color: var(--gold); }
+    .modal-feat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.5rem; }
+
+    .modal-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* ─── ADMIN PANEL ─── */
+    #admin-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 300;
+      display: none;
+      flex-direction: column;
+    }
+
+    #admin-overlay.open { display: flex; }
+
+    .admin-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-nav h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 1.3rem;
+    }
+
+    .btn-close-admin {
+      background: transparent;
+      border: 1px solid var(--border-hover);
+      color: var(--text-muted);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-close-admin:hover { border-color: #e74c3c; color: #e74c3c; }
+
+    .admin-tabs {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-tab {
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .admin-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+
+    .admin-form {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .admin-form h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .admin-prop-list { display: flex; flex-direction: column; gap: 1rem; }
+
+    .admin-prop-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .admin-prop-thumb {
+      width: 80px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .admin-prop-thumb-placeholder {
+      width: 80px;
+      height: 60px;
+      border-radius: 8px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .admin-prop-info { flex: 1; }
+    .admin-prop-title { font-weight: 500; font-size: 0.95rem; }
+    .admin-prop-meta { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem; }
+
+    .admin-prop-actions { display: flex; gap: 0.5rem; }
+
+    .btn-edit, .btn-delete {
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+
+    .btn-edit { background: rgba(201,169,110,0.15); color: var(--gold); }
+    .btn-edit:hover { background: var(--gold); color: var(--bg); }
+
+    .btn-delete { background: rgba(231,76,60,0.1); color: #e74c3c; }
+    .btn-delete:hover { background: #e74c3c; color: white; }
+
+    .admin-review-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .admin-review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+
+    .review-status {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.7rem;
+      border-radius: 50px;
+    }
+
+    .review-status.approved { background: rgba(39,174,96,0.15); color: #27ae60; }
+    .review-status.pending { background: rgba(231,126,34,0.15); color: #e67e22; }
+
+    /* ─── LOGIN MODAL ─── */
+    #login-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 400;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    #login-modal.open { display: flex; }
+
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .login-box .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+
+    .login-box p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
+
+    .login-box input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      text-align: center;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .login-box input:focus { outline: none; border-color: var(--gold); }
+
+    .login-error { color: #e74c3c; font-size: 0.8rem; margin-bottom: 0.75rem; display: none; }
+
+    .btn-cancel-login {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      transition: color 0.2s;
+    }
+
+    .btn-cancel-login:hover { color: var(--text); }
+
+    /* ─── TOAST ─── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--gold);
+      color: var(--bg);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 500;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a:not(:last-child) { display: none; }
+      section { padding: 4rem 1.25rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .reviews-layout { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-cards { flex-direction: column; align-items: center; }
+      .modal-features { grid-template-columns: repeat(2, 1fr); }
+      .admin-content { padding: 1rem; }
+    }
+
+    /* ─── IMAGE UPLOAD PREVIEW ─── */
+    .img-upload-area {
+      border: 2px dashed var(--border-hover);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .img-upload-area:hover { border-color: var(--gold); background: rgba(201,169,110,0.04); }
+
+    .img-previews {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .img-preview-wrap { position: relative; }
+
+    .img-preview {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .img-remove {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Edit modal overlay */
+    #edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 350;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(8px);
+    }
+
+    #edit-modal.open { display: flex; }
+
+    #edit-modal .modal {
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border-hover);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+
+    #edit-modal .modal h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav id="navbar">
+  <div class="nav-logo">
+    Tania Torres
+    <span>Asesora Inmobiliaria</span>
+  </div>
+  <div class="nav-links">
+    <a href="#propiedades">Propiedades</a>
+    <a href="#vender">Vender</a>
+    <a href="#creditos">Créditos</a>
+    <a href="#opiniones">Opiniones</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">✦ Asesora Inmobiliaria</div>
+    <h1>Compra o vende tu casa con <em>acompañamiento total</em></h1>
+    <p>Te acompaño en todo el proceso, desde la primera visita hasta la firma, en Guadalajara y toda la zona metropolitana.</p>
+    <div class="hero-btns">
+      <a href="#propiedades" class="btn-primary">Ver propiedades</a>
+      <a href="#vender" class="btn-secondary">Quiero vender mi casa</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Explorar
+  </div>
+</section>
+
+<!-- ─── SOBRE MÍ ─── -->
+<section id="sobre-mi">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img-wrap">
+        <div id="about-photo-wrap" class="about-img-placeholder">
+          <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Foto de Tania</span>
+        </div>
+        <div class="about-deco"></div>
+      </div>
+      <div>
+        <div class="section-label">Sobre mí</div>
+        <h2 class="section-title">Tania Torres,<br>tu aliada en bienes raíces</h2>
+        <p class="section-subtitle" style="margin-bottom: 1.5rem;">
+          Me apasiona ayudar a las personas a encontrar su lugar perfecto. Con un trato personalizado, honesto y comprometido, acompaño a mis clientes en cada paso del proceso, desde la búsqueda hasta la firma.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 300; line-height: 1.8; margin-bottom: 2rem;">
+          Cada cliente es único y merece una atención especial. Mi objetivo es que encuentres no solo una propiedad, sino tu hogar.
+        </p>
+        <div class="about-stats">
+          <div class="stat-card">
+            <div class="stat-number">+100</div>
+            <div class="stat-label">Clientes satisfechos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">+5</div>
+            <div class="stat-label">Años de experiencia</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">+100</div>
+            <div class="stat-label">Propiedades gestionadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Compromiso y confianza</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROPIEDADES ─── -->
+<section id="propiedades">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Disponibles ahora</div>
+      <h2 class="section-title">Propiedades destacadas</h2>
+      <p class="section-subtitle">Encuentra la propiedad que se adapta a tus necesidades y presupuesto.</p>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterProps('todos', this)">Todos</button>
+      <button class="filter-btn" onclick="filterProps('venta', this)">En venta</button>
+      <button class="filter-btn" onclick="filterProps('renta', this)">En renta</button>
+    </div>
+    <div class="props-grid" id="props-grid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ─── VENDER ─── -->
+<section id="vender">
+  <div class="container">
+    <div class="sell-grid">
+      <div>
+        <div class="section-label">Vende con Tania</div>
+        <h2 class="section-title">¿Quieres vender<br>tu casa?</h2>
+        <p class="section-subtitle">Me encargo de todo para que vendas en buenas condiciones y sin complicarte.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div><h4>Conozco tu casa</h4><p>Platicamos de tu propiedad, de lo que buscas y del tiempo que tienes para vender.</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h4>Fotos, video y anuncios</h4><p>Preparo el material y lo publico en redes sociales y portales para llegar a más compradores.</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h4>Atiendo a los interesados</h4><p>Respondo mensajes, filtro prospectos y organizo las visitas por ti.</p></div></div>
+          <div class="step"><div class="step-num">4</div><div><h4>Trámite completo hasta la firma</h4><p>Te acompaño con el papeleo y el crédito del comprador hasta cerrar la venta.</p></div></div>
+        </div>
+      </div>
+      <form class="sell-form" id="sell-form" onsubmit="return sendSellForm(event)">
+        <h3>Cuéntame de tu casa</h3>
+        <p>Llena estos datos y te contacto por WhatsApp.</p>
+        <div class="form-group">
+          <label for="sf-name">Tu nombre</label>
+          <input type="text" id="sf-name" required placeholder="ej. María González">
+        </div>
+        <div class="form-group">
+          <label for="sf-op">¿Qué quieres hacer?</label>
+          <select id="sf-op">
+            <option>Vender mi casa</option>
+            <option>Rentar mi casa</option>
+            <option>Comprar una casa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sf-zone">Colonia o fraccionamiento</label>
+          <input type="text" id="sf-zone" required placeholder="ej. Real del Valle, Tlajomulco">
+        </div>
+        <div class="form-group">
+          <label for="sf-notes">Algo más que deba saber (opcional)</label>
+          <textarea id="sf-notes" placeholder="Recámaras, precio que tienes en mente, cuándo quieres vender..."></textarea>
+        </div>
+        <button class="btn-submit" type="submit">Enviar por WhatsApp</button>
+        <p class="sell-note">Se abre WhatsApp con tu mensaje listo para enviar.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CRÉDITOS ─── -->
+<section id="creditos">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Formas de pago</div>
+      <h2 class="section-title">Te ayudo con tu crédito</h2>
+      <p class="section-subtitle">Te oriento para que elijas la mejor opción y te acompaño en el trámite.</p>
+    </div>
+    <div class="credit-grid">
+      <div class="credit-card"><h4>Infonavit</h4><p>Usa tu crédito Infonavit para comprar tu casa.</p></div>
+      <div class="credit-card"><h4>Fovissste</h4><p>Si trabajas para el Estado, te acompaño con tu crédito Fovissste.</p></div>
+      <div class="credit-card"><h4>Bancario</h4><p>Te oriento para comparar opciones de crédito hipotecario.</p></div>
+      <div class="credit-card"><h4>Contado</h4><p>Si pagas de contado, me encargo de que el proceso sea rápido y seguro.</p></div>
+    </div>
+    <div class="credits-cta"><a class="btn-primary" id="credit-wa" href="https://wa.me/5213322775288?text=Hola%20Tania%2C%20quiero%20informaci%C3%B3n%20sobre%20cr%C3%A9ditos%20para%20comprar%20casa" target="_blank" rel="noopener">Pregunta por tu crédito</a></div>
+  </div>
+</section>
+
+<!-- ─── OPINIONES ─── -->
+<section id="opiniones">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Lo que dicen</div>
+      <h2 class="section-title">Opiniones de clientes</h2>
+      <p class="section-subtitle">La experiencia de quienes ya encontraron su hogar con mi ayuda.</p>
+    </div>
+    <div class="reviews-layout">
+      <div>
+        <div class="reviews-list" id="reviews-list">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+      <div class="review-form-wrap">
+        <h3>Deja tu opinión</h3>
+        <p>¿Trabajaste conmigo? Me encantaría saber tu experiencia.</p>
+        <div class="form-group">
+          <label>Tu nombre</label>
+          <input type="text" id="r-name" placeholder="ej. María González">
+        </div>
+        <div class="form-group">
+          <label>Calificación</label>
+          <div class="star-picker" id="star-picker">
+            <span class="star-pick" data-val="1" onclick="setRating(1)">★</span>
+            <span class="star-pick" data-val="2" onclick="setRating(2)">★</span>
+            <span class="star-pick" data-val="3" onclick="setRating(3)">★</span>
+            <span class="star-pick" data-val="4" onclick="setRating(4)">★</span>
+            <span class="star-pick" data-val="5" onclick="setRating(5)">★</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Tu comentario</label>
+          <textarea id="r-comment" placeholder="Cuéntanos tu experiencia..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="submitReview()">Enviar opinión</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACTO ─── -->
+<section id="contacto">
+  <div class="container">
+    <div class="section-label" style="text-align:center">Hablemos</div>
+    <h2 class="section-title" style="text-align:center">¿Damos el siguiente paso?</h2>
+    <p class="section-subtitle" style="text-align:center; margin-inline:auto">Escríbeme o llámame y con gusto te asesoro para comprar o vender tu casa.</p>
+    <div class="contact-cards">
+      <a href="tel:3322775288" class="contact-card">
+        <svg width="28" height="28" fill="none" stroke="#c9a96e" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.93 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.84 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        <div class="contact-card-label">Teléfono</div>
+        <div class="contact-card-value" id="contact-phone">+52 33 2277 5288</div>
+      </a>
+      <a href="mailto:taniatorresvivar@gmail.com" class="contact-card">
+        <svg width="28" height="28" fill="none" stroke="#c9a96e" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <div class="contact-card-label">Correo</div>
+        <div class="contact-card-value" id="contact-email">taniatorresvivar@gmail.com</div>
+      </a>
+      <a href="https://wa.me/5213322775288" target="_blank" class="contact-card">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="#c9a96e">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+        </svg>
+        <div class="contact-card-label">WhatsApp</div>
+        <div class="contact-card-value">Escríbeme ahora</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo">Tania Torres</div>
+  <p>Asesora Inmobiliaria · Atención personalizada y profesional</p>
+  <p style="margin-top:0.5rem">© <span id="year">2026</span> Tania Torres. Todos los derechos reservados.</p>
+  <button class="footer-admin" onclick="openAdminLogin()">Administrar</button>
+</footer>
+
+<a class="wa-float" id="wa-float" href="https://wa.me/5213322775288?text=Hola%20Tania%2C%20vi%20tu%20p%C3%A1gina%20y%20quiero%20informaci%C3%B3n" target="_blank" rel="noopener" aria-label="Escríbeme por WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+</a>
+
+<!-- ─── PROPERTY MODAL ─── -->
+<div class="modal-overlay" id="prop-modal" onclick="closePropModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-gallery" id="modal-gallery"></div>
+    <div class="modal-body">
+      <span class="modal-badge" id="modal-badge">Venta</span>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-location" id="modal-location">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span></span>
+      </div>
+      <div class="modal-features" id="modal-features"></div>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="modal-cta">
+        <a href="#contacto" class="btn-primary" onclick="closeModal()">Contactar a Tania</a>
+        <a id="modal-wa" href="#" target="_blank" class="btn-secondary">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ADMIN LOGIN ─── -->
+<div id="login-modal">
+  <div class="login-box">
+    <div class="logo">Tania Torres</div>
+    <p>Panel de Administración</p>
+    <input type="password" id="admin-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkLogin()">
+    <p class="login-error" id="login-error">Contraseña incorrecta</p>
+    <button class="btn-submit" onclick="checkLogin()">Ingresar</button>
+    <br>
+    <button class="btn-cancel-login" onclick="closeAdminLogin()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ─── ADMIN PANEL ─── -->
+<div id="admin-overlay">
+  <div class="admin-nav">
+    <h2>⚡ Panel de Administración · Tania Torres</h2>
+    <button class="btn-close-admin" onclick="closeAdmin()">✕ Cerrar panel</button>
+  </div>
+  <div class="admin-tabs">
+    <div class="admin-tab active" onclick="adminTab('props', this)">🏠 Propiedades</div>
+    <div class="admin-tab" onclick="adminTab('reviews', this)">★ Reseñas</div>
+    <div class="admin-tab" onclick="adminTab('settings', this)">⚙ Ajustes</div>
+  </div>
+  <div class="admin-content">
+
+    <!-- PROPIEDADES TAB -->
+    <div class="admin-section active" id="tab-props">
+      <div class="admin-form">
+        <h3>+ Agregar nueva propiedad</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Título de la propiedad *</label>
+            <input type="text" id="a-title" placeholder="ej. Casa en Col. Americana">
+          </div>
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select id="a-type">
+              <option value="venta">Venta</option>
+              <option value="renta">Renta</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio *</label>
+            <input type="number" id="a-price" placeholder="ej. 2500000">
+          </div>
+          <div class="form-group">
+            <label>Ubicación *</label>
+            <input type="text" id="a-location" placeholder="ej. Guadalajara, Jalisco">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Recámaras</label>
+            <input type="number" id="a-beds" placeholder="ej. 3" min="0">
+          </div>
+          <div class="form-group">
+            <label>Baños</label>
+            <input type="number" id="a-baths" placeholder="ej. 2" min="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Superficie (m²)</label>
+            <input type="number" id="a-size" placeholder="ej. 120" min="0">
+          </div>
+          <div class="form-group">
+            <label>Estacionamientos</label>
+            <input type="number" id="a-parking" placeholder="ej. 2" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="a-desc" placeholder="Describe la propiedad: características, amenidades, estado..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Fotos (máximo 6)</label>
+          <div class="img-upload-area" onclick="document.getElementById('a-files').click()">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:0.5rem;opacity:0.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+            <p>Haz clic para subir fotos</p>
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.25rem">JPG, PNG, WebP · Máx 3MB cada una</p>
+          </div>
+          <input type="file" id="a-files" multiple accept="image/*" style="display:none" onchange="handleImgUpload(event)">
+          <div class="img-previews" id="img-previews"></div>
+        </div>
+        <button class="btn-submit" onclick="addProperty()">Guardar propiedad</button>
+      </div>
+
+      <h3 style="margin-bottom:1rem;color:var(--text-muted);font-size:0.9rem;letter-spacing:0.05em;text-transform:uppercase">Propiedades actuales</h3>
+      <div class="admin-prop-list" id="admin-prop-list">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- RESEÑAS TAB -->
+    <div class="admin-section" id="tab-reviews">
+      <h3 style="margin-bottom:1.5rem;font-family:'Playfair Display',serif;color:var(--gold);font-size:1.3rem">Gestión de reseñas</h3>
+      <div id="admin-reviews-list">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- AJUSTES TAB -->
+    <div class="admin-section" id="tab-settings">
+      <div class="admin-form">
+        <h3>⚙ Configuración del sitio</h3>
+        <div class="form-group">
+          <label>Teléfono de contacto</label>
+          <input type="text" id="s-phone" placeholder="+52 33 2277 5288">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="s-email" placeholder="taniatorresvivar@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Número de WhatsApp (solo dígitos, con código de país)</label>
+          <input type="text" id="s-wa" placeholder="5213322775288">
+        </div>
+        <div class="form-group">
+          <label>Foto de perfil (sección "Sobre mí")</label>
+          <div id="profile-photo-preview" style="margin-bottom:0.75rem;display:none">
+            <img id="profile-preview-img" src="" alt="Foto de perfil" style="width:100px;height:120px;object-fit:cover;object-position:center top;border-radius:12px;border:1px solid var(--border-hover)">
+            <button onclick="removeProfilePhoto()" style="display:block;margin-top:0.5rem;background:rgba(231,76,60,0.1);color:#e74c3c;border:none;padding:0.3rem 0.7rem;border-radius:8px;cursor:pointer;font-size:0.8rem">✕ Quitar foto</button>
+          </div>
+          <div class="img-upload-area" onclick="document.getElementById('s-photo-file').click()">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:0.5;margin-bottom:0.3rem"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <p>Subir foto de perfil</p>
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.25rem">JPG, PNG · Se mostrará en la sección principal</p>
+          </div>
+          <input type="file" id="s-photo-file" accept="image/*" style="display:none" onchange="handleProfilePhoto(event)">
+        </div>
+        <div class="form-group">
+          <label>Nueva contraseña del panel (dejar vacío para no cambiar)</label>
+          <input type="password" id="s-pass" placeholder="Nueva contraseña">
+        </div>
+        <button class="btn-submit" onclick="saveSettings()">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── EDIT MODAL ─── -->
+<div id="edit-modal">
+  <div class="modal">
+    <h3>✏ Editar propiedad</h3>
+    <input type="hidden" id="e-id">
+    <div class="form-row">
+      <div class="form-group"><label>Título *</label><input type="text" id="e-title"></div>
+      <div class="form-group"><label>Tipo *</label><select id="e-type"><option value="venta">Venta</option><option value="renta">Renta</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Precio *</label><input type="number" id="e-price"></div>
+      <div class="form-group"><label>Ubicación *</label><input type="text" id="e-location"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Recámaras</label><input type="number" id="e-beds"></div>
+      <div class="form-group"><label>Baños</label><input type="number" id="e-baths"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Superficie (m²)</label><input type="number" id="e-size"></div>
+      <div class="form-group"><label>Estacionamientos</label><input type="number" id="e-parking"></div>
+    </div>
+    <div class="form-group"><label>Descripción</label><textarea id="e-desc"></textarea></div>
+    <div class="form-group">
+      <label>Agregar más fotos</label>
+      <div class="img-upload-area" onclick="document.getElementById('e-files').click()">
+        <p>Haz clic para agregar fotos</p>
+      </div>
+      <input type="file" id="e-files" multiple accept="image/*" style="display:none" onchange="handleEditImgUpload(event)">
+      <div class="img-previews" id="edit-img-previews"></div>
+    </div>
+    <div style="display:flex;gap:1rem;margin-top:1rem">
+      <button class="btn-submit" onclick="saveEdit()" style="flex:1">Guardar cambios</button>
+      <button onclick="closeEditModal()" style="flex:0.4;background:transparent;border:1px solid var(--border-hover);color:var(--text-muted);padding:0.85rem;border-radius:var(--radius);cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, orderBy, query, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ════════════════════════════════════════════════════════
+// 🔥 CONFIGURACIÓN FIREBASE
+// Sigue las instrucciones al final de la página para obtener estos datos
+// ════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyDvmuiSmFS_UJxXmUkHwfybVoAvtf4nt44",
+  authDomain:        "tania-torres-web.firebaseapp.com",
+  projectId:         "tania-torres-web",
+  storageBucket:     "tania-torres-web.firebasestorage.app",
+  messagingSenderId: "594542001889",
+  appId:             "1:594542001889:web:7badbbcb0813db165101a0"
+};
+// ════════════════════════════════════════════════════════
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+const propsCol    = collection(db, 'properties');
+const reviewsCol  = collection(db, 'reviews');
+const settingsRef = doc(db, 'config', 'settings');
+
+// Contraseña admin (se guarda en Firebase; sin respaldo en el código)
+let cachedPass = null;
+
+// ════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function fmt(price, type) {
+  const n = new Intl.NumberFormat('es-MX', { style:'currency', currency:'MXN', maximumFractionDigits:0 }).format(price);
+  return type === 'renta' ? n + '/mes' : n;
+}
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function dateStr(iso) {
+  return new Date(iso).toLocaleDateString('es-MX', { year:'numeric', month:'long', day:'numeric' });
+}
+// ─── Compresión de imágenes (evita superar el límite de 1MB de Firestore) ───
+async function compressImage(file, maxPx = 900, quality = 0.65) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = url;
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// ESTADO LOCAL (caché en memoria)
+// ════════════════════════════════════════════════════════
+let allProps   = [];
+let allReviews = [];
+let siteSettings = { phone:'+52 33 2277 5288', email:'taniatorresvivar@gmail.com', wa:'5213322775288', profilePhoto:'' };
+
+// ════════════════════════════════════════════════════════
+// PROPIEDADES — VISTA PÚBLICA
+// ════════════════════════════════════════════════════════
+let currentFilter = 'todos';
+
+function renderProps() {
+  const grid = document.getElementById('props-grid');
+  let props = currentFilter === 'todos' ? allProps : allProps.filter(p => p.type === currentFilter);
+
+  if (!props.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <p>No hay propiedades disponibles aún.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = props.map(p => {
+    const imgHTML = p.images && p.images.length
+      ? `<img src="${p.images[0]}" class="prop-img" alt="${p.title}" onerror="this.parentElement.innerHTML='<div class=prop-img-placeholder><svg width=40 height=40 fill=none stroke=currentColor stroke-width=1 viewBox=0 0 24 24><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><polyline points=21,15 16,10 5,21/></svg></div>'">`
+      : `<div class="prop-img-placeholder"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
+    return `<div class="prop-card" onclick="window.openPropModal('${p.id}')">
+      ${imgHTML}
+      <span class="prop-badge ${p.type}">${p.type === 'venta' ? 'En Venta' : 'En Renta'}</span>
+      <div class="prop-body">
+        <div class="prop-price">${fmt(p.price, p.type)}</div>
+        <div class="prop-title">${p.title}</div>
+        <div class="prop-location"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${p.location}</div>
+        <div class="prop-features">
+          ${p.beds  ? `<div class="prop-feat"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>${p.beds} rec.</div>` : ''}
+          ${p.baths ? `<div class="prop-feat"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>${p.baths} baños</div>` : ''}
+          ${p.size  ? `<div class="prop-feat"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>${p.size} m²</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filterProps = function(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProps();
+};
+
+// ════════════════════════════════════════════════════════
+// MODAL PROPIEDAD
+// ════════════════════════════════════════════════════════
+let currentImgIdx = 0;
+let currentImages = [];
+
+window.openPropModal = function(id) {
+  const p = allProps.find(x => x.id === id);
+  if (!p) return;
+  currentImages = p.images || [];
+  currentImgIdx = 0;
+
+  const gallery = document.getElementById('modal-gallery');
+  if (currentImages.length) {
+    gallery.innerHTML = `
+      <img src="${currentImages[0]}" class="modal-img" id="modal-main-img" alt="${p.title}">
+      ${currentImages.length > 1 ? `
+      <div class="gallery-nav">
+        <button class="gallery-btn" onclick="window.prevImg()">‹</button>
+        <button class="gallery-btn" onclick="window.nextImg()">›</button>
+      </div>
+      <div class="gallery-dots" id="gallery-dots">
+        ${currentImages.map((_, i) => `<div class="gallery-dot ${i===0?'active':''}" onclick="window.goImg(${i})"></div>`).join('')}
+      </div>` : ''}`;
+  } else {
+    gallery.innerHTML = `<div class="modal-img-placeholder"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
+  }
+
+  document.getElementById('modal-badge').textContent = p.type === 'venta' ? 'En Venta' : 'En Renta';
+  document.getElementById('modal-badge').className = 'modal-badge ' + p.type;
+  document.getElementById('modal-price').textContent = fmt(p.price, p.type);
+  document.getElementById('modal-title').textContent = p.title;
+  document.getElementById('modal-location').querySelector('span').textContent = p.location;
+  document.getElementById('modal-desc').textContent = p.description || 'Contáctanos para más información.';
+  document.getElementById('modal-wa').href = `https://wa.me/${siteSettings.wa}?text=Hola Tania, me interesa la propiedad: ${p.title}`;
+
+  const feats = document.getElementById('modal-features');
+  feats.innerHTML = [
+    p.beds    ? { val: p.beds,         label:'Recámaras' }        : null,
+    p.baths   ? { val: p.baths,        label:'Baños' }             : null,
+    p.size    ? { val: p.size + ' m²', label:'Superficie' }        : null,
+    p.parking ? { val: p.parking,      label:'Estacionamientos' }  : null,
+  ].filter(Boolean).map(f => `<div class="modal-feat"><div class="modal-feat-val">${f.val}</div><div class="modal-feat-label">${f.label}</div></div>`).join('');
+
+  document.getElementById('prop-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.prevImg = function() { currentImgIdx = (currentImgIdx - 1 + currentImages.length) % currentImages.length; updateGallery(); };
+window.nextImg = function() { currentImgIdx = (currentImgIdx + 1) % currentImages.length; updateGallery(); };
+window.goImg   = function(i) { currentImgIdx = i; updateGallery(); };
+function updateGallery() {
+  const img = document.getElementById('modal-main-img');
+  if (img) img.src = currentImages[currentImgIdx];
+  document.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === currentImgIdx));
+}
+window.closePropModal = function(e) { if (e.target === document.getElementById('prop-modal')) window.closeModal(); };
+window.closeModal = function() { document.getElementById('prop-modal').classList.remove('open'); document.body.style.overflow = ''; };
+
+// ════════════════════════════════════════════════════════
+// RESEÑAS — VISTA PÚBLICA
+// ════════════════════════════════════════════════════════
+let selectedRating = 0;
+
+window.setRating = function(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star-pick').forEach((s, i) => s.classList.toggle('sel', i < n));
+};
+
+function renderReviews() {
+  const list = document.getElementById('reviews-list');
+  const approved = allReviews.filter(r => r.approved);
+  if (!approved.length) {
+    list.innerHTML = `<div style="color:var(--text-dim);font-size:0.9rem;padding:2rem 0">Aún no hay reseñas. ¡Sé el primero en opinar!</div>`;
+    return;
+  }
+  list.innerHTML = approved.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div class="reviewer-name">${r.name}</div>
+        <div class="reviewer-date">${dateStr(r.date)}</div>
+      </div>
+      <div class="stars">${stars(r.rating)}</div>
+      <div class="review-comment">${r.comment}</div>
+    </div>`).join('');
+}
+
+window.submitReview = async function() {
+  const name    = document.getElementById('r-name').value.trim();
+  const comment = document.getElementById('r-comment').value.trim();
+  if (!name)           { toast('Por favor escribe tu nombre'); return; }
+  if (!selectedRating) { toast('Por favor selecciona una calificación'); return; }
+  if (!comment)        { toast('Por favor escribe un comentario'); return; }
+
+  try {
+    await addDoc(reviewsCol, { name, rating: selectedRating, comment, date: new Date().toISOString(), approved: false });
+    document.getElementById('r-name').value    = '';
+    document.getElementById('r-comment').value = '';
+    selectedRating = 0;
+    document.querySelectorAll('.star-pick').forEach(s => s.classList.remove('sel'));
+    toast('¡Gracias por tu reseña! Será publicada pronto.');
+  } catch(e) { toast('Error al enviar. Inténtalo de nuevo.'); console.error(e); }
+};
+
+// ════════════════════════════════════════════════════════
+// ADMIN — LOGIN
+// ════════════════════════════════════════════════════════
+window.openAdminLogin  = function() { document.getElementById('login-modal').classList.add('open'); setTimeout(() => document.getElementById('admin-pass').focus(), 100); };
+window.closeAdminLogin = function() { document.getElementById('login-modal').classList.remove('open'); document.getElementById('admin-pass').value = ''; document.getElementById('login-error').style.display = 'none'; };
+window.checkLogin = function() {
+  const pass = document.getElementById('admin-pass').value;
+  if (cachedPass && pass === cachedPass) { window.closeAdminLogin(); openAdmin(); }
+  else { document.getElementById('login-error').style.display = 'block'; document.getElementById('admin-pass').value = ''; document.getElementById('admin-pass').focus(); }
+};
+
+// ════════════════════════════════════════════════════════
+// ADMIN — PANEL
+// ════════════════════════════════════════════════════════
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderAdminProps();
+  renderAdminReviews();
+  loadSettingsForm();
+}
+window.closeAdmin = function() { document.getElementById('admin-overlay').classList.remove('open'); document.body.style.overflow = ''; };
+window.adminTab = function(name, btn) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+};
+
+// ─── Imágenes (agregar propiedad) ───
+let pendingImages = [];
+window.handleImgUpload = async function(e) {
+  const files = Array.from(e.target.files);
+  const remaining = 4 - pendingImages.length;
+  if (!remaining) { toast('Máximo 4 fotos por propiedad'); return; }
+  for (const file of files.slice(0, remaining)) {
+    try {
+      const compressed = await compressImage(file);
+      pendingImages.push(compressed);
+      renderImgPreviews();
+    } catch(err) { toast(`Error al procesar ${file.name}`); }
+  }
+  e.target.value = '';
+};
+function renderImgPreviews() {
+  document.getElementById('img-previews').innerHTML = pendingImages.map((src, i) => `
+    <div class="img-preview-wrap">
+      <img src="${src}" class="img-preview">
+      <button class="img-remove" onclick="window.removeImg(${i})">✕</button>
+    </div>`).join('');
+}
+window.removeImg = function(i) { pendingImages.splice(i, 1); renderImgPreviews(); };
+
+// ─── Agregar propiedad ───
+window.addProperty = async function() {
+  const title    = document.getElementById('a-title').value.trim();
+  const type     = document.getElementById('a-type').value;
+  const price    = parseFloat(document.getElementById('a-price').value);
+  const location = document.getElementById('a-location').value.trim();
+  const beds     = parseInt(document.getElementById('a-beds').value)    || 0;
+  const baths    = parseInt(document.getElementById('a-baths').value)   || 0;
+  const size     = parseInt(document.getElementById('a-size').value)    || 0;
+  const parking  = parseInt(document.getElementById('a-parking').value) || 0;
+  const desc     = document.getElementById('a-desc').value.trim();
+
+  if (!title)        { toast('El título es obligatorio'); return; }
+  if (!price || price <= 0) { toast('El precio es obligatorio'); return; }
+  if (!location)     { toast('La ubicación es obligatoria'); return; }
+
+  try {
+    await addDoc(propsCol, { title, type, price, location, beds, baths, size, parking, description: desc, images: [...pendingImages], date: new Date().toISOString() });
+    ['a-title','a-price','a-location','a-beds','a-baths','a-size','a-parking','a-desc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('a-type').value = 'venta';
+    pendingImages = [];
+    renderImgPreviews();
+    toast('✓ Propiedad guardada');
+  } catch(e) { toast('Error al guardar. Verifica tu conexión.'); console.error(e); }
+};
+
+// ─── Lista de propiedades admin ───
+function renderAdminProps() {
+  const list = document.getElementById('admin-prop-list');
+  if (!allProps.length) { list.innerHTML = '<p style="color:var(--text-dim);font-size:0.875rem">No hay propiedades aún. Agrega la primera arriba.</p>'; return; }
+  list.innerHTML = allProps.map(p => {
+    const thumb = p.images && p.images.length
+      ? `<img src="${p.images[0]}" class="admin-prop-thumb" alt="${p.title}">`
+      : `<div class="admin-prop-thumb-placeholder"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>`;
+    return `<div class="admin-prop-item">
+      ${thumb}
+      <div class="admin-prop-info">
+        <div class="admin-prop-title">${p.title}</div>
+        <div class="admin-prop-meta">${p.type === 'venta' ? 'Venta' : 'Renta'} · ${fmt(p.price, p.type)} · ${p.location}</div>
+      </div>
+      <div class="admin-prop-actions">
+        <button class="btn-edit" onclick="window.openEditModal('${p.id}')">✏ Editar</button>
+        <button class="btn-delete" onclick="window.deleteProp('${p.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.deleteProp = async function(id) {
+  if (!confirm('¿Segura que quieres eliminar esta propiedad?')) return;
+  try { await deleteDoc(doc(db, 'properties', id)); toast('Propiedad eliminada'); }
+  catch(e) { toast('Error al eliminar'); console.error(e); }
+};
+
+// ─── Editar propiedad ───
+let editImages = [];
+window.openEditModal = function(id) {
+  const p = allProps.find(x => x.id === id);
+  if (!p) return;
+  editImages = [...(p.images || [])];
+  document.getElementById('e-id').value       = id;
+  document.getElementById('e-title').value    = p.title;
+  document.getElementById('e-type').value     = p.type;
+  document.getElementById('e-price').value    = p.price;
+  document.getElementById('e-location').value = p.location;
+  document.getElementById('e-beds').value     = p.beds    || '';
+  document.getElementById('e-baths').value    = p.baths   || '';
+  document.getElementById('e-size').value     = p.size    || '';
+  document.getElementById('e-parking').value  = p.parking || '';
+  document.getElementById('e-desc').value     = p.description || '';
+  renderEditImgPreviews();
+  document.getElementById('edit-modal').classList.add('open');
+};
+window.handleEditImgUpload = async function(e) {
+  const files = Array.from(e.target.files);
+  const remaining = 4 - editImages.length;
+  for (const file of files.slice(0, remaining)) {
+    try {
+      const compressed = await compressImage(file);
+      editImages.push(compressed);
+      renderEditImgPreviews();
+    } catch(err) { toast(`Error al procesar ${file.name}`); }
+  }
+  e.target.value = '';
+};
+function renderEditImgPreviews() {
+  document.getElementById('edit-img-previews').innerHTML = editImages.map((src, i) => `
+    <div class="img-preview-wrap">
+      <img src="${src}" class="img-preview">
+      <button class="img-remove" onclick="window.removeEditImg(${i})">✕</button>
+    </div>`).join('');
+}
+window.removeEditImg = function(i) { editImages.splice(i, 1); renderEditImgPreviews(); };
+window.saveEdit = async function() {
+  const id       = document.getElementById('e-id').value;
+  const title    = document.getElementById('e-title').value.trim();
+  const price    = parseFloat(document.getElementById('e-price').value);
+  const location = document.getElementById('e-location').value.trim();
+  if (!title || !price || !location) { toast('Completa los campos obligatorios'); return; }
+  try {
+    await updateDoc(doc(db, 'properties', id), {
+      title, type: document.getElementById('e-type').value, price, location,
+      beds:     parseInt(document.getElementById('e-beds').value)    || 0,
+      baths:    parseInt(document.getElementById('e-baths').value)   || 0,
+      size:     parseInt(document.getElementById('e-size').value)    || 0,
+      parking:  parseInt(document.getElementById('e-parking').value) || 0,
+      description: document.getElementById('e-desc').value.trim(),
+      images: [...editImages],
+    });
+    window.closeEditModal();
+    toast('✓ Propiedad actualizada');
+  } catch(e) { toast('Error al actualizar'); console.error(e); }
+};
+window.closeEditModal = function() { document.getElementById('edit-modal').classList.remove('open'); };
+
+// ─── Reseñas admin ───
+function renderAdminReviews() {
+  const list = document.getElementById('admin-reviews-list');
+  if (!allReviews.length) { list.innerHTML = '<p style="color:var(--text-dim);font-size:0.875rem">No hay reseñas aún.</p>'; return; }
+  list.innerHTML = allReviews.map(r => `
+    <div class="admin-review-item">
+      <div class="admin-review-header">
+        <div>
+          <strong>${r.name}</strong> · <span style="color:var(--gold)">${stars(r.rating)}</span>
+          <span style="color:var(--text-dim);font-size:0.75rem;margin-left:0.5rem">${dateStr(r.date)}</span>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <span class="review-status ${r.approved ? 'approved' : 'pending'}">${r.approved ? '✓ Publicada' : '⏳ Pendiente'}</span>
+          <button class="btn-edit" onclick="window.toggleReview('${r.id}','${r.approved}')">${r.approved ? 'Ocultar' : 'Publicar'}</button>
+          <button class="btn-delete" onclick="window.deleteReview('${r.id}')">✕</button>
+        </div>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.875rem">${r.comment}</p>
+    </div>`).join('');
+}
+window.toggleReview = async function(id, currentApproved) {
+  try {
+    await updateDoc(doc(db, 'reviews', id), { approved: currentApproved !== 'true' });
+    toast('Reseña actualizada');
+  } catch(e) { toast('Error al actualizar reseña'); console.error(e); }
+};
+window.deleteReview = async function(id) {
+  if (!confirm('¿Eliminar esta reseña?')) return;
+  try { await deleteDoc(doc(db, 'reviews', id)); toast('Reseña eliminada'); }
+  catch(e) { toast('Error al eliminar'); console.error(e); }
+};
+
+// ─── Ajustes ───
+let pendingProfilePhoto = null;
+
+window.handleProfilePhoto = async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    pendingProfilePhoto = await compressImage(file, 700, 0.75);
+    document.getElementById('profile-preview-img').src = pendingProfilePhoto;
+    document.getElementById('profile-photo-preview').style.display = 'block';
+  } catch(err) { toast('Error al procesar la foto'); }
+  e.target.value = '';
+};
+window.removeProfilePhoto = function() {
+  pendingProfilePhoto = '';
+  document.getElementById('profile-preview-img').src = '';
+  document.getElementById('profile-photo-preview').style.display = 'none';
+};
+
+function applyProfilePhoto(photoSrc) {
+  const wrap = document.getElementById('about-photo-wrap');
+  if (!wrap) return;
+  if (photoSrc) {
+    if (wrap.tagName === 'IMG') { wrap.src = photoSrc; }
+    else { wrap.outerHTML = `<img id="about-photo-wrap" src="${photoSrc}" class="about-photo-img" alt="Tania Torres - Asesora Inmobiliaria">`; }
+  } else {
+    if (wrap.tagName === 'IMG') {
+      wrap.outerHTML = `<div id="about-photo-wrap" class="about-img-placeholder">
+        <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Foto de Tania</span></div>`;
+    }
+  }
+}
+
+function loadSettingsForm() {
+  document.getElementById('s-phone').value = siteSettings.phone || '';
+  document.getElementById('s-email').value = siteSettings.email || '';
+  document.getElementById('s-wa').value    = siteSettings.wa    || '';
+  pendingProfilePhoto = null;
+  if (siteSettings.profilePhoto) {
+    document.getElementById('profile-preview-img').src = siteSettings.profilePhoto;
+    document.getElementById('profile-photo-preview').style.display = 'block';
+    pendingProfilePhoto = siteSettings.profilePhoto;
+  } else {
+    document.getElementById('profile-photo-preview').style.display = 'none';
+  }
+}
+
+window.saveSettings = async function() {
+  const phone = document.getElementById('s-phone').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const wa    = document.getElementById('s-wa').value.trim();
+  const newPass = document.getElementById('s-pass').value;
+  const profilePhoto = pendingProfilePhoto !== null ? pendingProfilePhoto : (siteSettings.profilePhoto || '');
+  const adminPass = newPass || cachedPass;
+
+  try {
+    await setDoc(settingsRef, { phone, email, wa, profilePhoto, adminPass });
+    siteSettings = { phone, email, wa, profilePhoto, adminPass };
+    cachedPass = adminPass;
+    if (newPass) { document.getElementById('s-pass').value = ''; }
+
+    // Actualizar contacto en pantalla
+    const ph = document.getElementById('contact-phone');
+    const em = document.getElementById('contact-email');
+    if (ph) { ph.textContent = phone; ph.closest('a').href = 'tel:' + phone.replace(/\s/g,''); }
+    if (em) { em.textContent = email; em.closest('a').href = 'mailto:' + email; }
+    syncWaLinks(wa);
+
+    applyProfilePhoto(profilePhoto);
+    toast('✓ Configuración guardada');
+  } catch(e) { toast('Error al guardar ajustes'); console.error(e); }
+};
+
+
+// ════════════════════════════════════════════════════════
+// FORMULARIO "VENDE TU CASA" → WHATSAPP
+// ════════════════════════════════════════════════════════
+window.sendSellForm = function(e) {
+  e.preventDefault();
+  const name  = document.getElementById('sf-name').value.trim();
+  const op    = document.getElementById('sf-op').value;
+  const zone  = document.getElementById('sf-zone').value.trim();
+  const notes = document.getElementById('sf-notes').value.trim();
+  let msg = `Hola Tania, soy ${name}. Me interesa: ${op}.\nZona: ${zone}`;
+  if (notes) msg += `\nDetalles: ${notes}`;
+  window.open(`https://wa.me/${siteSettings.wa || '5213322775288'}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+  return false;
+};
+
+function syncWaLinks(wa) {
+  if (!wa) return;
+  document.querySelectorAll('a[href*="wa.me/"]').forEach(a => {
+    a.href = a.href.replace(/wa\.me\/\d+/, 'wa.me/' + wa);
+  });
+}
+document.getElementById('year').textContent = new Date().getFullYear();
+if (location.hash === '#admin') setTimeout(() => window.openAdminLogin && window.openAdminLogin(), 300);
+
+// ════════════════════════════════════════════════════════
+// INICIALIZACIÓN Y LISTENERS EN TIEMPO REAL
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+
+  // Cargar ajustes del sitio
+  try {
+    const snap = await getDoc(settingsRef);
+    if (snap.exists()) {
+      siteSettings = snap.data();
+      if (siteSettings.adminPass) cachedPass = siteSettings.adminPass;
+      const ph = document.getElementById('contact-phone');
+      const em = document.getElementById('contact-email');
+      if (ph) { ph.textContent = siteSettings.phone; ph.closest('a').href = 'tel:' + siteSettings.phone.replace(/\s/g,''); }
+      if (em) { em.textContent = siteSettings.email; em.closest('a').href = 'mailto:' + siteSettings.email; }
+      syncWaLinks(siteSettings.wa);
+      if (siteSettings.profilePhoto) applyProfilePhoto(siteSettings.profilePhoto);
+    }
+  } catch(e) { console.warn('No se pudieron cargar los ajustes:', e); }
+
+  // Listener en tiempo real: PROPIEDADES
+  onSnapshot(query(propsCol, orderBy('date', 'desc')), snap => {
+    allProps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderProps();
+    renderAdminProps();
+  });
+
+  // Listener en tiempo real: RESEÑAS
+  onSnapshot(query(reviewsCol, orderBy('date', 'desc')), snap => {
+    allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderReviews();
+    renderAdminReviews();
+  });
+
+  // Teclado
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { window.closeModal(); window.closeEditModal(); }
+  });
+});
+</script>
+</body>
+</html>

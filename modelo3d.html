@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Recorrido 3D | Tania Torres Asesora Inmobiliaria</title>
+  <meta name="description" content="Recorre la propiedad en 3D y mira cómo podría quedar remodelada.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080810; --surface: #0f0f1a; --card: #14142a;
+      --gold: #c9a96e; --gold-light: #e4c98a; --gold-dark: #a07840;
+      --text: #f0ede8; --text-muted: #8a8a9a; --border: rgba(201,169,110,0.18); --border-hover: rgba(201,169,110,0.45);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+    #visor { position: fixed; inset: 0; touch-action: none; }
+    #visor canvas { display: block; }
+
+    .barra { position: fixed; top: 0; left: 0; right: 0; padding: max(16px, env(safe-area-inset-top)) 20px 28px; display: flex; align-items: flex-start; gap: 14px;
+      background: linear-gradient(180deg, rgba(8,8,16,.92) 0%, rgba(8,8,16,0) 100%); pointer-events: none; z-index: 5; }
+    .barra > * { pointer-events: auto; }
+    .volver { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-hover); display: grid; place-items: center; color: var(--gold); text-decoration: none; background: rgba(8,8,16,.5); }
+    .volver:hover { border-color: var(--gold); }
+    .titulo h1 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.25rem, 3vw, 1.7rem); line-height: 1.15; }
+    .titulo p { color: var(--text-muted); font-size: .82rem; margin-top: .25rem; }
+    .titulo .sello { display: inline-block; margin-top: .55rem; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--border-hover); border-radius: 99px; padding: .25rem .65rem; }
+
+    .panel { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom)); width: min(560px, calc(100% - 24px)); z-index: 5;
+      background: rgba(15,15,26,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 18px; padding: 14px; display: grid; gap: 10px; }
+    .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; }
+    .seg button { font: inherit; font-size: .84rem; color: var(--text-muted); background: none; border: 0; border-radius: 9px; padding: .62rem .4rem; cursor: pointer; transition: background .2s, color .2s; white-space: nowrap; }
+    .seg button:hover { color: var(--text); }
+    .seg button[aria-pressed="true"] { background: var(--gold); color: #12100c; font-weight: 600; }
+    .seg.secundario button[aria-pressed="true"] { background: rgba(201,169,110,.16); color: var(--gold-light); box-shadow: inset 0 0 0 1px var(--border-hover); }
+    .pie { display: flex; align-items: center; gap: 12px; }
+    .nota { flex: 1; font-size: .7rem; color: var(--text-muted); line-height: 1.45; }
+    .wa { flex: none; display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; font-weight: 600; color: #12100c; background: var(--gold); text-decoration: none; padding: .65rem 1rem; border-radius: 10px; }
+    .wa:hover { background: var(--gold-light); }
+
+    .pista { position: fixed; left: 50%; transform: translateX(-50%); z-index: 4; font-size: .72rem; color: var(--text-muted); letter-spacing: .04em; transition: opacity .6s; pointer-events: none; white-space: nowrap; }
+
+    .casa3d-etiquetas { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .casa3d-etiqueta { position: absolute; left: 0; top: 0; text-align: center; transition: opacity .3s; opacity: 0; background: rgba(8,8,16,.72); border: 1px solid var(--border-hover); border-radius: 8px; padding: .3rem .55rem; white-space: nowrap; }
+    .casa3d-etiqueta strong { display: block; font-family: 'Playfair Display', serif; font-weight: 400; font-size: .86rem; color: var(--text); }
+    .casa3d-etiqueta span { display: block; font-size: .64rem; color: var(--gold); letter-spacing: .05em; margin-top: 1px; }
+
+    .cargando { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); z-index: 10; transition: opacity .6s; }
+    .cargando div { text-align: center; color: var(--text-muted); font-size: .85rem; }
+    .cargando i { display: block; width: 38px; height: 38px; margin: 0 auto 14px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: gira 1s linear infinite; }
+    @keyframes gira { to { transform: rotate(360deg); } }
+    .error { color: var(--text); }
+    .error a { color: var(--gold); }
+
+    @media (max-width: 520px) {
+      .panel { padding: 10px; gap: 8px; border-radius: 16px; }
+      .seg button { font-size: .78rem; padding: .58rem .2rem; }
+      .nota { font-size: .64rem; }
+      .wa { padding: .6rem .8rem; font-size: .78rem; }
+    }
+  </style>
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <div id="visor" aria-label="Modelo 3D de la propiedad"></div>
+
+  <header class="barra">
+    <a class="volver" href="/#propiedades" aria-label="Volver a propiedades">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 18l-6-6 6-6"/></svg>
+    </a>
+    <div class="titulo">
+      <h1 id="t-nombre">Recorrido 3D</h1>
+      <p id="t-sub"></p>
+      <span class="sello">Modelo 3D · gíralo y explóralo</span>
+    </div>
+  </header>
+
+  <div class="pista" id="pista">Arrastra para girar · pellizca para acercar</div>
+
+  <section class="panel" id="panel" hidden>
+    <div class="seg" role="group" aria-label="Estado de la casa">
+      <button data-modo="actual" aria-pressed="true">Así está</button>
+      <button data-modo="renovado" aria-pressed="false">Así podría quedar</button>
+    </div>
+    <div class="seg secundario" role="group" aria-label="Vista">
+      <button data-vista="fachada" aria-pressed="true">Fachada</button>
+      <button data-vista="alta" aria-pressed="false">Planta alta</button>
+      <button data-vista="baja" aria-pressed="false">Planta baja</button>
+    </div>
+    <div class="pie">
+      <p class="nota" id="nota"></p>
+      <a class="wa" id="wa" href="https://wa.me/5213322775288" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.6.1a8.2 8.2 0 0 1-4.1-3.6c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1.1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.5 13.5 0 0 0 5.2 4.6c1.9.8 2.7.9 3.6.7a3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.3-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+        Agendar visita
+      </a>
+    </div>
+  </section>
+
+  <div class="cargando" id="cargando"><div><i></i>Cargando modelo 3D…</div></div>
+
+  <script type="module">
+    import { crearVisor } from '/js/casa3d.js';
+
+    const params = new URLSearchParams(location.search);
+    const slug = (params.get('m') || '').replace(/[^a-z0-9-]/gi, '');
+    const cargando = document.getElementById('cargando');
+    const fallo = (msg) => { cargando.innerHTML = `<div class="error">${msg}<br><br><a href="/#propiedades">Ver propiedades</a></div>`; };
+
+    // Número de WhatsApp: el mismo que se configura en el panel del sitio
+    fetch('https://firestore.googleapis.com/v1/projects/tania-torres-web/databases/(default)/documents/config/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const wa = d?.fields?.wa?.stringValue;
+        if (wa) window.__wa = wa.replace(/\D/g, '');
+        actualizarWa();
+      }).catch(() => {});
+    let nombreCasa = '';
+    function actualizarWa() {
+      const n = window.__wa || '5213322775288';
+      const txt = `Hola Tania, vi el recorrido 3D de la ${nombreCasa || 'propiedad'} y me gustaría agendar una visita.`;
+      document.getElementById('wa').href = `https://wa.me/${n}?text=${encodeURIComponent(txt)}`;
+    }
+
+    if (!slug) fallo('No encontramos este modelo 3D.');
+    else {
+      try {
+        const r = await fetch(`/modelos/${slug}.json`);
+        if (!r.ok) throw new Error('404');
+        const cfg = await r.json();
+        nombreCasa = cfg.nombre;
+        document.title = `${cfg.nombre} en 3D | Tania Torres Asesora Inmobiliaria`;
+        document.getElementById('t-nombre').textContent = cfg.nombre;
+        document.getElementById('t-sub').textContent = cfg.subtitulo || '';
+        document.getElementById('nota').textContent = cfg.nota || '';
+        actualizarWa();
+
+        let visor; visor = crearVisor(document.getElementById('visor'), cfg, {
+          onListo() {
+            cargando.style.opacity = 0; setTimeout(() => cargando.remove(), 600);
+            const panel = document.getElementById('panel');
+            panel.hidden = false;
+            const margen = () => visor.setMargenInferior(panel.offsetHeight + 16);
+            margen(); addEventListener('resize', margen);
+            colocarPista();
+          }
+        });
+        window.__visor = visor;
+
+        document.querySelectorAll('[data-modo]').forEach(b => b.addEventListener('click', () => {
+          document.querySelectorAll('[data-modo]').forEach(x => x.setAttribute('aria-pressed', x === b));
+          visor.setModo(b.dataset.modo);
+        }));
+        document.querySelectorAll('[data-vista]').forEach(b => b.addEventListener('click', () => {
+          document.querySelectorAll('[data-vista]').forEach(x => x.setAttribute('aria-pressed', x === b));
+          visor.setVista(b.dataset.vista);
+        }));
+      } catch (e) {
+        console.error(e); fallo('No se pudo cargar el modelo 3D.');
+      }
+    }
+
+    function colocarPista() {
+      const p = document.getElementById('pista'), panel = document.getElementById('panel');
+      p.style.bottom = (panel.offsetHeight + 28) + 'px';
+      const ocultar = () => { p.style.opacity = 0; };
+      document.getElementById('visor').addEventListener('pointerdown', ocultar, { once: true });
+      setTimeout(ocultar, 7000);
+    }
+  </script>
+</body>
+</html>

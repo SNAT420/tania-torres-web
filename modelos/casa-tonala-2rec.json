@@ -1,0 +1,111 @@
+{
+  "nombre": "Casa en Tonalá",
+  "subtitulo": "2 recámaras · 1½ baños · cochera · patio",
+  "aproximado": true,
+  "nota": "Modelo ilustrativo con medidas aproximadas. La propuesta de remodelación es una idea de cómo podría quedar y no está incluida en el precio.",
+
+  "lote": { "frente": 4.5, "fondo": 15.5 },
+  "casa": { "z0": 4.5, "z1": 12.5, "altura": 2.5, "losa": 0.15, "pretil": 0.6 },
+
+  "fachada": {
+    "actual":   { "baja": "#D3C8B5", "alta": "#C6B8A2", "lateral": "#B9B2A6" },
+    "renovado": { "baja": "#2A2A2E", "alta": "#F1EDE6", "lateral": "#E4DFD6" }
+  },
+  "plafon": { "actual": "#E7DCC2", "renovado": "#F5F3EF" },
+
+  "pisos": [
+    {
+      "nombre": "Planta baja",
+      "cuartos": [
+        { "id": "sala", "nombre": "Sala · Comedor", "x": 0, "z": 4.5, "w": 4.5, "d": 5.5,
+          "muro": { "actual": "#D99A2B", "actualLados": { "E": "#3E9A3E", "N": "#3E9A3E" },
+                    "renovado": "#EEE8DE", "renovadoLados": { "E": "#2C2C30" } },
+          "piso": { "actual": "azulejo", "renovado": "porcelanato" } },
+        { "id": "cocina", "nombre": "Cocina", "x": 0, "z": 10, "w": 2.6, "d": 2.5,
+          "muro": { "actual": "#3E9A3E", "renovado": "#EEE8DE" },
+          "piso": { "actual": "azulejo", "renovado": "porcelanato" } },
+        { "id": "medio-bano", "nombre": "Medio baño", "x": 2.6, "z": 10, "w": 1.9, "d": 2.5,
+          "muro": { "actual": "#2D4FA0", "renovado": "#E3E0DA" },
+          "piso": { "actual": "azulejo", "renovado": "porcelanato" } }
+      ]
+    },
+    {
+      "nombre": "Planta alta",
+      "cuartos": [
+        { "id": "rec1", "nombre": "Recámara 1", "x": 0, "z": 4.5, "w": 4.5, "d": 3.3,
+          "muro": { "actual": "#A8232C", "renovado": "#EEE8DE", "renovadoLados": { "W": "#C9B48A" } },
+          "piso": { "actual": "azulejo", "renovado": "madera" } },
+        { "id": "bano", "nombre": "Baño completo", "x": 0, "z": 7.8, "w": 2.6, "d": 2.2,
+          "muro": { "actual": "#1C2F7A", "renovado": "#E3E0DA", "renovadoLados": { "N": "#3A3A3F" } },
+          "piso": { "actual": "azulejo", "renovado": "porcelanato" } },
+        { "id": "pasillo", "nombre": "Pasillo", "x": 2.6, "z": 7.8, "w": 0.9, "d": 2.2, "muros": [], "etiqueta": false,
+          "muro": { "actual": "#D99A2B", "renovado": "#EEE8DE" },
+          "piso": { "actual": "azulejo", "renovado": "madera" } },
+        { "id": "escalera", "nombre": "Escalera", "x": 3.5, "z": 7.8, "w": 1.0, "d": 2.2, "muros": ["E"], "conPiso": false, "etiqueta": false,
+          "muro": { "actual": "#D99A2B", "renovado": "#EEE8DE" },
+          "piso": { "actual": "azulejo", "renovado": "madera" } },
+        { "id": "rec2", "nombre": "Recámara 2", "x": 0, "z": 10, "w": 4.5, "d": 2.5,
+          "muro": { "actual": "#1F4DB5", "renovado": "#EEE8DE", "renovadoLados": { "W": "#B9C2B0" } },
+          "piso": { "actual": "azulejo", "renovado": "madera" } }
+      ]
+    }
+  ],
+
+  "escalera": { "x": 3.5, "w": 1.0, "z0": 7.3, "z1": 10.0, "escalones": 12,
+                "color": { "actual": "#CFC6B8", "renovado": "#A97E55" } },
+  "barandal": { "piso": 1, "x": 3.5, "z0": 7.8, "z1": 9.9 },
+
+  "aberturas": [
+    { "piso": 0, "eje": "z", "en": 4.5,  "de": 0.55, "a": 1.45, "tipo": "puerta", "principal": true },
+    { "piso": 0, "eje": "z", "en": 4.5,  "de": 2.0,  "a": 4.0,  "tipo": "ventana", "antepecho": 0.9 },
+    { "piso": 0, "eje": "z", "en": 10,   "de": 0.2,  "a": 2.4,  "tipo": "vano" },
+    { "piso": 0, "eje": "z", "en": 10,   "de": 2.75, "a": 3.45, "tipo": "puerta" },
+    { "piso": 0, "eje": "z", "en": 12.5, "de": 1.5,  "a": 2.4,  "tipo": "puerta" },
+    { "piso": 0, "eje": "z", "en": 12.5, "de": 0.2,  "a": 1.3,  "tipo": "ventana", "antepecho": 1.05 },
+    { "piso": 0, "eje": "z", "en": 12.5, "de": 3.4,  "a": 4.1,  "tipo": "ventana", "antepecho": 1.5 },
+
+    { "piso": 1, "eje": "z", "en": 4.5,  "de": 0.9,  "a": 2.4,  "tipo": "ventana", "antepecho": 1.0 },
+    { "piso": 1, "eje": "z", "en": 7.8,  "de": 2.65, "a": 3.45, "tipo": "puerta" },
+    { "piso": 1, "eje": "x", "en": 2.6,  "de": 8.4,  "a": 9.2,  "tipo": "puerta" },
+    { "piso": 1, "eje": "z", "en": 10,   "de": 2.65, "a": 3.45, "tipo": "puerta" },
+    { "piso": 1, "eje": "z", "en": 12.5, "de": 1.0,  "a": 2.6,  "tipo": "ventana", "antepecho": 1.0 }
+  ],
+
+  "exterior": {
+    "cochera": { "actual": "pasto", "renovado": "concreto" },
+    "reja":    { "actual": "malla", "renovado": "herreria" },
+    "patio":   { "actual": { "barda": "#4C8A4A", "techo": true }, "renovado": { "barda": "#ECE7DE", "techo": false } }
+  },
+
+  "muebles": {
+    "actual": [],
+    "renovado": [
+      { "piso": 0, "tipo": "tapete",      "x": 1.45, "z": 6.0,  "w": 2.2, "d": 1.7 },
+      { "piso": 0, "tipo": "sofa",        "x": 0.5,  "z": 6.0,  "rot": 90 },
+      { "piso": 0, "tipo": "mesaCentro",  "x": 1.6,  "z": 6.0 },
+      { "piso": 0, "tipo": "muebleTV",    "x": 4.25, "z": 6.0,  "rot": -90 },
+      { "piso": 0, "tipo": "comedor",     "x": 1.6,  "z": 8.6 },
+      { "piso": 0, "tipo": "lampara",     "x": 1.6,  "z": 8.6 },
+      { "piso": 0, "tipo": "planta",      "x": 0.35, "z": 4.9 },
+      { "piso": 0, "tipo": "planta",      "x": 4.1,  "z": 4.9 },
+      { "piso": 0, "tipo": "cocina",      "x": 0.36, "z": 11.3, "rot": 90, "largo": 2.2 },
+      { "piso": 0, "tipo": "wc",          "x": 4.1,  "z": 12.08, "rot": 180 },
+      { "piso": 0, "tipo": "lavabo",      "x": 3.05, "z": 12.25, "rot": 180 },
+
+      { "piso": 1, "tipo": "tapete",      "x": 1.9,  "z": 6.15, "w": 2.4, "d": 2.0 },
+      { "piso": 1, "tipo": "cama",        "x": 1.06, "z": 6.15, "rot": 90, "ancho": 1.4 },
+      { "piso": 1, "tipo": "buro",        "x": 0.27, "z": 5.15, "rot": 90 },
+      { "piso": 1, "tipo": "buro",        "x": 0.27, "z": 7.15, "rot": 90 },
+      { "piso": 1, "tipo": "closet",      "x": 4.14, "z": 6.0,  "rot": -90, "largo": 1.8 },
+      { "piso": 1, "tipo": "planta",      "x": 3.0,  "z": 4.85 },
+
+      { "piso": 1, "tipo": "cama",        "x": 1.06, "z": 11.15, "rot": 90, "ancho": 1.35 },
+      { "piso": 1, "tipo": "buro",        "x": 0.27, "z": 12.2, "rot": 90 },
+      { "piso": 1, "tipo": "escritorio",  "x": 4.17, "z": 11.4, "rot": -90 },
+
+      { "piso": 1, "tipo": "regadera",    "x": 0.52, "z": 9.47 },
+      { "piso": 1, "tipo": "wc",          "x": 0.42, "z": 8.25, "rot": 90 },
+      { "piso": 1, "tipo": "lavabo",      "x": 1.55, "z": 8.0 }
+    ]
+  }
+}

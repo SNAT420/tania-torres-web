@@ -141,7 +141,9 @@
         document.getElementById('nota').textContent = cfg.nota || '';
         actualizarWa();
 
+        const calidad = ['alta', 'baja'].includes(params.get('calidad')) ? params.get('calidad') : 'auto';
         let visor; visor = crearVisor(document.getElementById('visor'), cfg, {
+          calidad,
           onListo() {
             cargando.style.opacity = 0; setTimeout(() => cargando.remove(), 600);
             const panel = document.getElementById('panel');

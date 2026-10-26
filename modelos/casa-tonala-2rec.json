@@ -9,8 +9,11 @@
 
   "fachada": {
     "actual":   { "baja": "#D3C8B5", "alta": "#C6B8A2", "lateral": "#B9B2A6" },
-    "renovado": { "baja": "#2A2A2E", "alta": "#F1EDE6", "lateral": "#E4DFD6" }
+    "renovado": { "baja": "#2A2A2E", "alta": "#F1EDE6", "lateral": "#E4DFD6" },
+    "marquesina": { "y": 2.45, "de": 0.3, "a": 4.2, "saliente": 0.7 },
+    "listones": { "de": 2.65, "a": 4.35, "y0": 2.95, "y1": 4.9 }
   },
+  "auto": { "x": 2.9, "z": 2.3, "rot": 180 },
   "plafon": { "actual": "#E7DCC2", "renovado": "#F5F3EF" },
 
   "pisos": [
@@ -56,18 +59,18 @@
   "barandal": { "piso": 1, "x": 3.5, "z0": 7.8, "z1": 9.9 },
 
   "aberturas": [
-    { "piso": 0, "eje": "z", "en": 4.5,  "de": 0.55, "a": 1.45, "tipo": "puerta", "principal": true },
+    { "piso": 0, "eje": "z", "en": 4.5,  "de": 0.55, "a": 1.45, "tipo": "puerta", "principal": true, "abre": "+" },
     { "piso": 0, "eje": "z", "en": 4.5,  "de": 2.0,  "a": 4.0,  "tipo": "ventana", "antepecho": 0.9 },
     { "piso": 0, "eje": "z", "en": 10,   "de": 0.2,  "a": 2.4,  "tipo": "vano" },
-    { "piso": 0, "eje": "z", "en": 10,   "de": 2.75, "a": 3.45, "tipo": "puerta" },
-    { "piso": 0, "eje": "z", "en": 12.5, "de": 1.5,  "a": 2.4,  "tipo": "puerta" },
+    { "piso": 0, "eje": "z", "en": 10,   "de": 2.75, "a": 3.45, "tipo": "puerta", "abre": "+" },
+    { "piso": 0, "eje": "z", "en": 12.5, "de": 1.5,  "a": 2.4,  "tipo": "puerta", "abre": "+" },
     { "piso": 0, "eje": "z", "en": 12.5, "de": 0.2,  "a": 1.3,  "tipo": "ventana", "antepecho": 1.05 },
     { "piso": 0, "eje": "z", "en": 12.5, "de": 3.4,  "a": 4.1,  "tipo": "ventana", "antepecho": 1.5 },
 
     { "piso": 1, "eje": "z", "en": 4.5,  "de": 0.9,  "a": 2.4,  "tipo": "ventana", "antepecho": 1.0 },
-    { "piso": 1, "eje": "z", "en": 7.8,  "de": 2.65, "a": 3.45, "tipo": "puerta" },
-    { "piso": 1, "eje": "x", "en": 2.6,  "de": 8.4,  "a": 9.2,  "tipo": "puerta" },
-    { "piso": 1, "eje": "z", "en": 10,   "de": 2.65, "a": 3.45, "tipo": "puerta" },
+    { "piso": 1, "eje": "z", "en": 7.8,  "de": 2.65, "a": 3.45, "tipo": "puerta", "abre": "-" },
+    { "piso": 1, "eje": "x", "en": 2.6,  "de": 8.4,  "a": 9.2,  "tipo": "puerta", "abre": "-" },
+    { "piso": 1, "eje": "z", "en": 10,   "de": 2.65, "a": 3.45, "tipo": "puerta", "abre": "+" },
     { "piso": 1, "eje": "z", "en": 12.5, "de": 1.0,  "a": 2.6,  "tipo": "ventana", "antepecho": 1.0 }
   ],
 

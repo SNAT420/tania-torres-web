@@ -30,7 +30,7 @@
     .titulo .sello { display: inline-block; margin-top: .55rem; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--border-hover); border-radius: 99px; padding: .25rem .65rem; }
 
     .panel { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom)); width: min(560px, calc(100% - 24px)); z-index: 5;
-      background: rgba(15,15,26,.86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 18px; padding: 14px; display: grid; gap: 10px; }
+      background: rgba(15,15,26,.86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 18px; padding: 14px; display: grid; gap: 10px; }
     .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; }
     .seg button { font: inherit; font-size: .84rem; color: var(--text-muted); background: none; border: 0; border-radius: 9px; padding: .62rem .4rem; cursor: pointer; transition: background .2s, color .2s; white-space: nowrap; }
     .seg button:hover { color: var(--text); }
@@ -56,6 +56,20 @@
     .error { color: var(--text); }
     .error a { color: var(--gold); }
 
+    @media (max-width: 360px) {
+      .titulo .sello { display: none; }
+      .titulo h1 { font-size: 1.15rem; }
+    }
+    /* celular acostado: panel compacto a la derecha para que se vea la casa */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .barra { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 12px; }
+      .titulo p, .titulo .sello, .pista, .nota { display: none; }
+      .titulo h1 { font-size: 1.1rem; }
+      .panel { left: auto; right: max(10px, env(safe-area-inset-right)); bottom: max(8px, env(safe-area-inset-bottom)); transform: none; width: min(400px, 52vw); padding: 8px; gap: 6px; border-radius: 14px; }
+      .seg button { padding: .42rem .2rem; font-size: .74rem; }
+      .pie { justify-content: flex-end; }
+      .wa { padding: .5rem .8rem; font-size: .76rem; }
+    }
     @media (max-width: 520px) {
       .panel { padding: 10px; gap: 8px; border-radius: 16px; }
       .seg button { font-size: .78rem; padding: .58rem .2rem; }
@@ -63,9 +77,10 @@
       .wa { padding: .6rem .8rem; font-size: .78rem; }
     }
   </style>
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" crossorigin="anonymous"></script>
   <script type="importmap">
     { "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     } }
   </script>
@@ -146,7 +161,8 @@
             cargando.style.opacity = 0; setTimeout(() => cargando.remove(), 600);
             const panel = document.getElementById('panel');
             panel.hidden = false;
-            const margen = () => visor.setMargenInferior(panel.offsetHeight + 16);
+            // acostado y con poca altura el panel va a un lado, así que no se recorre la imagen
+            const margen = () => visor.setMargenInferior(innerHeight < 500 && innerWidth > innerHeight ? 0 : panel.offsetHeight + 16);
             margen(); addEventListener('resize', margen);
             colocarPista();
           }

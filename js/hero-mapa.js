@@ -28,6 +28,10 @@ function relleno(anillo, r) {
 
 export async function iniciarHeroMapa(contenedor, capaPines) {
   const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tactil = matchMedia('(pointer: coarse)').matches;
+  // con ahorro de datos o conexión lenta no se carga el mapa (la página se ve bien sin él)
+  const con = navigator.connection;
+  if (con && (con.saveData || /(^|-)2g$/.test(con.effectiveType || ''))) return null;
   const [datos, textura] = await Promise.all([
     fetch('/mapa/zmg.json').then(r => r.json()),
     new THREE.TextureLoader().loadAsync('/img/mapa/tierra-noche.jpg'),
@@ -35,7 +39,7 @@ export async function iniciarHeroMapa(contenedor, capaPines) {
   textura.colorSpace = THREE.SRGBColorSpace; textura.anisotropy = 4;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, tactil ? 1.5 : 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.domElement.className = 'hero-mapa-canvas';
   contenedor.appendChild(renderer.domElement);
@@ -45,7 +49,7 @@ export async function iniciarHeroMapa(contenedor, capaPines) {
 
   // Planeta y atmósfera dorada
   const globoMat = new THREE.MeshBasicMaterial({ map: textura, transparent: true });
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 128, 96), globoMat));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, tactil ? 80 : 128, tactil ? 60 : 96), globoMat));
   const atmMat = new THREE.ShaderMaterial({
     transparent: true, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false,
     uniforms: { c: { value: new THREE.Color('#c9a96e') }, o: { value: 1 } },
@@ -116,7 +120,7 @@ export async function iniciarHeroMapa(contenedor, capaPines) {
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(ajustar); ro.observe(contenedor); ajustar();
-  addEventListener('pointermove', e => { px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; }, { passive: true });
+  if (!tactil) addEventListener('pointermove', e => { px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; }, { passive: true });
 
   // un solo ciclo de dibujo; se pausa cuando el hero no se ve o la pestaña está oculta
   let visible = true, corriendo = false;
@@ -126,8 +130,12 @@ export async function iniciarHeroMapa(contenedor, capaPines) {
   new ResizeObserver(() => arrancar()).observe(contenedor);
 
   contenedor.classList.add('listo');
+  let ultimo = 0;
   function cuadro(tiempo) {
     if (!visible || document.hidden) { corriendo = false; return; }
+    // terminada la intro el mapa solo gira despacio: con 30 cuadros por segundo basta y se ahorra batería
+    if (s >= 1 && !reducido && tiempo - ultimo < 32) { requestAnimationFrame(cuadro); return; }
+    ultimo = tiempo ?? performance.now();
     if (!reducido) {
       if (t0 === null) t0 = tiempo + 350;
       s = Math.min(1, Math.max(0, (tiempo - t0) / 1000 / DUR));

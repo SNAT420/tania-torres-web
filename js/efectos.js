@@ -24,8 +24,9 @@
   }, { rootMargin: '0px 0px -8% 0px', threshold: .08 }) : null;
   function mostrar(el) {
     el.classList.add('vis');
-    const limpiar = () => { el.classList.remove('rv', 'vis'); el.style.transitionDelay = ''; };
-    el.addEventListener('transitionend', limpiar, { once: true });
+    const limpiar = () => { el.classList.remove('rv', 'vis'); el.style.transitionDelay = ''; el.removeEventListener('transitionend', fin); };
+    const fin = e => { if (e.target === el && e.propertyName === 'opacity') limpiar(); };
+    el.addEventListener('transitionend', fin);
     setTimeout(limpiar, 1600);
   }
   function preparar(contexto) {
@@ -113,7 +114,11 @@
       const card = document.querySelector(`.zone-card[data-zona="${el.dataset.zona}"]`);
       if (card) { card.focus({ preventScroll: true }); card.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'nearest' }); }
     }));
-    const ioMapa = new IntersectionObserver(([e]) => { if (e.isIntersecting) { mapa.classList.add('dibujado'); ioMapa.disconnect(); } }, { threshold: .3 });
+    // se dibuja al llegar; los pulsos se pausan cuando el mapa no está a la vista
+    const ioMapa = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && e.intersectionRatio >= .3) mapa.classList.add('dibujado');
+      mapa.classList.toggle('pausado', !e.isIntersecting);
+    }, { threshold: [0, .3] });
     ioMapa.observe(mapa);
     // si el hero manda a una zona, se ilumina al llegar
     document.addEventListener('click', e => {

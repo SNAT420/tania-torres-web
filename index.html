@@ -158,7 +158,7 @@
       align-items: center;
       padding: 1rem 2.5rem;
       background: rgba(8,8,16,0.85);
-      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       transition: all 0.3s;
     }
@@ -453,7 +453,7 @@
 
     .props-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
       gap: 1.5rem;
     }
 
@@ -741,7 +741,7 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s;
@@ -1086,7 +1086,7 @@
       z-index: 400;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     }
 
     #login-modal.open { display: flex; }
@@ -1233,7 +1233,7 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     }
 
     #edit-modal.open { display: flex; }
@@ -1276,7 +1276,7 @@
     .hero-pin { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: .45rem; opacity: 0; color: var(--text); text-decoration: none; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; transition: opacity .6s; will-change: transform; }
     .hero-pin i { position: relative; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,.25), 0 0 18px rgba(201,169,110,.8); }
     .hero-pin i::after { content: ''; position: absolute; inset: -9px; border-radius: 50%; border: 1px solid var(--gold); animation: pulso 2.4s ease-out infinite; }
-    .hero-pin span { background: rgba(8,8,16,.7); border: 1px solid var(--border-hover); padding: .25rem .55rem; border-radius: 50px; backdrop-filter: blur(6px); }
+    .hero-pin span { background: rgba(8,8,16,.7); border: 1px solid var(--border-hover); padding: .25rem .55rem; border-radius: 50px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
     .hero-pin:hover span { border-color: var(--gold); color: var(--gold-light); }
     @keyframes pulso { from { transform: scale(.4); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
     .hero-content { z-index: 3; max-width: 640px; margin-left: max(1.5rem, 7vw); }
@@ -1327,6 +1327,7 @@
     .zona-pin .pulso { fill: none; stroke: var(--gold); stroke-width: 1; transform-box: fill-box; transform-origin: center; animation: pulso 2.6s ease-out infinite; }
     .zona-pin text { fill: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; text-anchor: middle; paint-order: stroke; stroke: #0b0b14; stroke-width: 4px; }
     .zona-pin.activa text { fill: var(--gold-light); }
+    .zonas-mapa.pausado .pulso, .zonas-mapa:not(.dibujado) .pulso { animation-play-state: paused; }
     .zonas-layout .zones-grid { grid-template-columns: 1fr; gap: .75rem; margin-top: 0; }
     .zonas-layout .zone-card { min-height: 0; padding: 1.1rem 3.2rem 1.1rem 1.3rem; }
     .zonas-layout .zone-card::before { top: 50%; transform: translateY(-50%); right: 1rem; }
@@ -1361,15 +1362,42 @@
       .reviews-carrusel { grid-template-columns: 1fr; height: 520px; }
       .reviews-col:nth-child(2) { display: none; }
     }
+
+    /* Correcciones para celulares */
+    html { -webkit-text-size-adjust: 100%; }
+    body { overflow-x: hidden; }
+    @supports (overflow: clip) { body { overflow-x: clip; } }
+    .hero { height: auto; min-height: 100vh; min-height: 100svh; padding: 6rem 0 4.5rem; box-sizing: border-box; }
+    @media (max-height: 640px) { .hero-scroll { display: none; } }
+    @media (min-width: 821px) and (max-height: 860px) {
+      .hero { padding-top: 5.25rem; padding-bottom: 2.5rem; }
+      .hero h1 { font-size: clamp(2.4rem, 4.6vw, 3.7rem); }
+      .hero-tag { margin-bottom: 1rem; } .hero p { margin-bottom: 1.8rem; } .hero-rating { margin-top: 1.4rem; }
+    }
+    @media (max-width: 768px) { .about-deco { right: 0; bottom: -12px; width: 140px; height: 140px; } }
+    @media (max-width: 768px) {
+      /* el menú abierto debe tapar por completo lo de atrás */
+      .nav-links { background: #0a0a12; box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+      nav.menu-abierto { -webkit-backdrop-filter: none; backdrop-filter: none; background: #08080f; }
+    }
+    @media (max-width: 360px) {
+      .hero h1 { font-size: 2.15rem; }
+      .hero p { font-size: 1rem; }
+      .hero-btns { flex-direction: column; align-items: stretch; padding: 0 .5rem; }
+      .hero-btns a { text-align: center; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .hero-tag, .hero h1, .hero p, .hero-btns, .hero-rating, .hero h1 em, .reviews-col, .hero-pin i::after, .zona-pin .pulso { animation: none !important; }
       .reviews-carrusel { overflow-y: auto; }
       .zona-path { stroke-dasharray: none; stroke-dashoffset: 0; }
     }
   </style>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" crossorigin="anonymous"></script>
   <script type="importmap">
     { "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     } }
   </script>
@@ -1973,6 +2001,7 @@ function toggleNav(force) {
   const links = document.getElementById('nav-links'), btn = document.getElementById('nav-toggle');
   const open = typeof force === 'boolean' ? force : !links.classList.contains('open');
   links.classList.toggle('open', open); btn.classList.toggle('open', open);
+  document.getElementById('navbar').classList.toggle('menu-abierto', open);
   btn.setAttribute('aria-expanded', open);
 }
 document.querySelectorAll('#nav-links a').forEach(a => a.addEventListener('click', () => toggleNav(false)));

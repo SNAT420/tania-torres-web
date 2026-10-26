@@ -915,6 +915,9 @@
       gap: 1rem;
       flex-wrap: wrap;
     }
+    .btn-3d { display: inline-flex; align-items: center; gap: .5rem; }
+    .btn-3d[hidden] { display: none; }
+    .prop-badge-3d { position: absolute; top: 1rem; right: 1rem; background: rgba(8,8,16,.75); color: var(--gold); border: 1px solid var(--border-hover); font-size: .68rem; font-weight: 600; letter-spacing: .1em; padding: .28rem .7rem; border-radius: 50px; }
 
     /* ─── ADMIN PANEL ─── */
     #admin-overlay {
@@ -1636,6 +1639,7 @@
       <div class="modal-cta">
         <a href="#contacto" class="btn-primary" onclick="closeModal()">Contactar a Tania</a>
         <a id="modal-wa" href="#" target="_blank" class="btn-secondary">Preguntar por WhatsApp</a>
+        <a id="modal-3d" href="#" class="btn-secondary btn-3d" hidden><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>Ver en 3D</a>
       </div>
     </div>
   </div>
@@ -1726,6 +1730,10 @@
           </div>
         </div>
         <div class="form-group">
+          <label>Modelo 3D (opcional)</label>
+          <input type="text" id="a-modelo3d" placeholder="ej. casa-tonala-2rec">
+        </div>
+        <div class="form-group">
           <label>Descripción</label>
           <textarea id="a-desc" placeholder="Describe la propiedad: características, amenidades, estado..."></textarea>
         </div>
@@ -1814,6 +1822,7 @@
       <div class="form-group"><label>Estacionamientos</label><input type="number" id="e-parking"></div>
     </div>
     <div class="form-group"><label>Descripción</label><textarea id="e-desc"></textarea></div>
+    <div class="form-group"><label>Modelo 3D (opcional)</label><input type="text" id="e-modelo3d" placeholder="ej. casa-tonala-2rec"></div>
     <div class="form-group">
       <label>Agregar más fotos</label>
       <div class="img-upload-area" onclick="document.getElementById('e-files').click()">
@@ -1938,6 +1947,10 @@ async function compressImage(file, maxPx = 900, quality = 0.65) {
 // ESTADO LOCAL (caché en memoria)
 // ════════════════════════════════════════════════════════
 let allProps   = [];
+// Modelos 3D: el campo "modelo3d" de la propiedad (panel) o el mapa /modelos/propiedades.json (id → modelo)
+let mapa3d = {};
+const modelo3dDe = p => String(p.modelo3d || mapa3d[p.id] || '').replace(/[^a-z0-9-]/gi, '');
+fetch('/modelos/propiedades.json').then(r => r.ok ? r.json() : {}).then(m => { mapa3d = m || {}; if (allProps.length) renderProps(); }).catch(() => {});
 let allReviews = [];
 let siteSettings = { phone:'+52 33 2277 5288', email:'taniatorresvivar@gmail.com', wa:'5213322775288', profilePhoto:'' };
 
@@ -1968,6 +1981,7 @@ function renderProps() {
     return `<div class="prop-card${sold ? ' is-sold' : ''}" onclick="window.openPropModal('${p.id}')">
       ${imgHTML}
       <span class="prop-badge ${sold ? 'vendida' : p.type}">${sold ? 'Vendida' : (p.type === 'venta' ? 'En Venta' : 'En Renta')}</span>
+      ${modelo3dDe(p) && !sold ? '<span class="prop-badge-3d">3D</span>' : ''}
       <div class="prop-body">
         <div class="prop-price">${fmt(p.price, p.type)}</div>
         <div class="prop-title">${p.title}</div>
@@ -2024,6 +2038,11 @@ window.openPropModal = function(id) {
   document.getElementById('modal-location').querySelector('span').textContent = p.location;
   document.getElementById('modal-desc').textContent = p.description || 'Contáctanos para más información.';
   document.getElementById('modal-wa').href = `https://wa.me/${siteSettings.wa}?text=Hola Tania, me interesa la propiedad: ${p.title}`;
+  const btn3d = document.getElementById('modal-3d');
+  const vendida = /^\s*vendid[ao]/i.test(p.description || '') || p.status === 'vendida';
+  const slug3d = vendida ? '' : modelo3dDe(p);
+  btn3d.hidden = !slug3d;
+  if (slug3d) btn3d.href = `/modelo3d?m=${slug3d}`;
 
   const feats = document.getElementById('modal-features');
   feats.innerHTML = [
@@ -2193,14 +2212,15 @@ window.addProperty = async function() {
   const size     = parseInt(document.getElementById('a-size').value)    || 0;
   const parking  = parseInt(document.getElementById('a-parking').value) || 0;
   const desc     = document.getElementById('a-desc').value.trim();
+  const modelo3d = document.getElementById('a-modelo3d').value.trim();
 
   if (!title)        { toast('El título es obligatorio'); return; }
   if (!price || price <= 0) { toast('El precio es obligatorio'); return; }
   if (!location)     { toast('La ubicación es obligatoria'); return; }
 
   try {
-    await addDoc(propsCol, { title, type, price, location, beds, baths, size, parking, description: desc, images: [...pendingImages], date: new Date().toISOString() });
-    ['a-title','a-price','a-location','a-beds','a-baths','a-size','a-parking','a-desc'].forEach(id => document.getElementById(id).value = '');
+    await addDoc(propsCol, { title, type, price, location, beds, baths, size, parking, description: desc, modelo3d, images: [...pendingImages], date: new Date().toISOString() });
+    ['a-title','a-price','a-location','a-beds','a-baths','a-size','a-parking','a-desc','a-modelo3d'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('a-type').value = 'venta';
     pendingImages = [];
     renderImgPreviews();
@@ -2252,6 +2272,7 @@ window.openEditModal = function(id) {
   document.getElementById('e-size').value     = p.size    || '';
   document.getElementById('e-parking').value  = p.parking || '';
   document.getElementById('e-desc').value     = p.description || '';
+  document.getElementById('e-modelo3d').value = p.modelo3d || '';
   renderEditImgPreviews();
   document.getElementById('edit-modal').classList.add('open');
 };
@@ -2289,6 +2310,7 @@ window.saveEdit = async function() {
       size:     parseInt(document.getElementById('e-size').value)    || 0,
       parking:  parseInt(document.getElementById('e-parking').value) || 0,
       description: document.getElementById('e-desc').value.trim(),
+      modelo3d: document.getElementById('e-modelo3d').value.trim(),
       images: [...editImages],
     });
     window.closeEditModal();

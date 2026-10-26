@@ -1,0 +1,100 @@
+{
+  "tipo": "departamento",
+  "nombre": "Departamento en Viande, Tlaquepaque",
+  "subtitulo": "2 recámaras · 1 baño · balcón · cuarto de lavado",
+  "aproximado": true,
+  "nota": "Modelo ilustrativo con medidas aproximadas. La versión amueblada es una idea de cómo podría verse; se entrega con cocina integral y clósets.",
+  "modos": { "actual": "Así se entrega", "renovado": "Amueblado" },
+  "vistaGeneral": "Vista general",
+
+  "lote": { "frente": 7.0, "fondo": 9.4 },
+  "casa": { "z0": 1.2, "z1": 9.4, "altura": 2.45, "losa": 0.15, "pretil": 0, "tinaco": false },
+
+  "fachada": {
+    "actual":   { "baja": "#9C9C99", "alta": "#9C9C99", "lateral": "#9C9C99" },
+    "renovado": { "baja": "#9C9C99", "alta": "#9C9C99", "lateral": "#9C9C99" }
+  },
+  "plafon": { "actual": "#F3F1EC", "renovado": "#F5F3EF" },
+
+  "pisos": [
+    {
+      "nombre": "Planta",
+      "cuartos": [
+        { "id": "sala", "nombre": "Sala · Comedor", "x": 0, "z": 1.2, "w": 3.8, "d": 4.8,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC", "renovadoLados": { "W": "#3A3A3F" } },
+          "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "cocina", "nombre": "Cocina", "x": 0, "z": 6.0, "w": 2.4, "d": 2.2, "muros": ["W", "N", "E"],
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC" }, "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "lavado", "nombre": "Lavado", "x": 0, "z": 8.2, "w": 1.4, "d": 1.2,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC" }, "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "entrada", "nombre": "Entrada", "x": 1.4, "z": 8.2, "w": 1.0, "d": 1.2, "muros": [], "etiqueta": false,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC" }, "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "pasillo", "nombre": "Pasillo", "x": 2.4, "z": 6.0, "w": 1.4, "d": 3.4, "muros": [], "etiqueta": false,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC" }, "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "rec1", "nombre": "Recámara 1", "x": 3.8, "z": 1.2, "w": 3.2, "d": 3.4,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC", "renovadoLados": { "E": "#B9A587" } },
+          "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "bano", "nombre": "Baño", "x": 3.8, "z": 4.6, "w": 3.2, "d": 2.0,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC", "renovadoLados": { "S": "#5A5651" } },
+          "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } },
+        { "id": "rec2", "nombre": "Recámara 2", "x": 3.8, "z": 6.6, "w": 3.2, "d": 2.8,
+          "muro": { "actual": "#F3F1EC", "renovado": "#F3F1EC", "renovadoLados": { "E": "#B9C2B0" } },
+          "piso": { "actual": "porcelanatoGris", "renovado": "porcelanatoGris" } }
+      ]
+    }
+  ],
+
+  "balcones": [ { "piso": 0, "x": 0.3, "z": 0.0, "w": 2.8, "d": 1.2 } ],
+
+  "aberturas": [
+    { "piso": 0, "eje": "z", "en": 1.2,  "de": 0.5,  "a": 2.9,  "tipo": "ventanal" },
+    { "piso": 0, "eje": "z", "en": 1.2,  "de": 4.3,  "a": 6.5,  "tipo": "ventana", "antepecho": 0.9 },
+    { "piso": 0, "eje": "z", "en": 6.0,  "de": 0.05, "a": 2.35, "tipo": "vano", "alto": 2.45 },
+    { "piso": 0, "eje": "z", "en": 6.0,  "de": 2.45, "a": 3.75, "tipo": "vano", "alto": 2.45 },
+    { "piso": 0, "eje": "x", "en": 3.8,  "de": 3.7,  "a": 4.45, "tipo": "puerta", "abre": "+" },
+    { "piso": 0, "eje": "x", "en": 3.8,  "de": 4.9,  "a": 5.6,  "tipo": "puerta", "abre": "+" },
+    { "piso": 0, "eje": "x", "en": 3.8,  "de": 6.8,  "a": 7.55, "tipo": "puerta", "abre": "+" },
+    { "piso": 0, "eje": "x", "en": 1.4,  "de": 8.35, "a": 9.05, "tipo": "puerta", "abre": "-" },
+    { "piso": 0, "eje": "z", "en": 9.4,  "de": 1.5,  "a": 2.35, "tipo": "puerta", "principal": true, "abre": "-" },
+    { "piso": 0, "eje": "x", "en": 7.0,  "de": 5.2,  "a": 6.2,  "tipo": "ventana", "antepecho": 1.5 },
+    { "piso": 0, "eje": "x", "en": 7.0,  "de": 7.3,  "a": 8.9,  "tipo": "ventana", "antepecho": 1.0 },
+    { "piso": 0, "eje": "x", "en": 0,    "de": 8.5,  "a": 9.1,  "tipo": "ventana", "antepecho": 1.4 }
+  ],
+
+  "muebles": {
+    "actual": [
+      { "piso": 0, "tipo": "cocina",   "x": 0.36, "z": 7.1,  "rot": 90, "largo": 2.0 },
+      { "piso": 0, "tipo": "closet",   "x": 6.25, "z": 4.24, "rot": 180, "largo": 1.3 },
+      { "piso": 0, "tipo": "closet",   "x": 6.35, "z": 6.96, "rot": 0, "largo": 1.1 },
+      { "piso": 0, "tipo": "lavabo",   "x": 4.25, "z": 4.84 },
+      { "piso": 0, "tipo": "wc",       "x": 5.0,  "z": 4.92 },
+      { "piso": 0, "tipo": "regadera", "x": 6.5,  "z": 6.1 },
+      { "piso": 0, "tipo": "lavadero", "x": 0.36, "z": 8.8,  "rot": 90 }
+    ],
+    "renovado": [
+      { "piso": 0, "tipo": "cocina",   "x": 0.36, "z": 7.1,  "rot": 90, "largo": 2.0 },
+      { "piso": 0, "tipo": "closet",   "x": 6.25, "z": 4.24, "rot": 180, "largo": 1.3 },
+      { "piso": 0, "tipo": "closet",   "x": 6.35, "z": 6.96, "rot": 0, "largo": 1.1 },
+      { "piso": 0, "tipo": "lavabo",   "x": 4.25, "z": 4.84 },
+      { "piso": 0, "tipo": "wc",       "x": 5.0,  "z": 4.92 },
+      { "piso": 0, "tipo": "regadera", "x": 6.5,  "z": 6.1 },
+      { "piso": 0, "tipo": "lavadero", "x": 0.36, "z": 8.8,  "rot": 90 },
+      { "piso": 0, "tipo": "tapete",   "x": 1.6,  "z": 3.1,  "w": 2.2, "d": 1.7 },
+      { "piso": 0, "tipo": "sofa",     "x": 0.5,  "z": 3.1,  "rot": 90 },
+      { "piso": 0, "tipo": "mesaCentro", "x": 1.65, "z": 3.1 },
+      { "piso": 0, "tipo": "muebleTV", "x": 3.55, "z": 2.6,  "rot": -90 },
+      { "piso": 0, "tipo": "comedor",  "x": 1.7,  "z": 5.0 },
+      { "piso": 0, "tipo": "lampara",  "x": 1.7,  "z": 5.0 },
+      { "piso": 0, "tipo": "planta",   "x": 3.4,  "z": 1.55 },
+      { "piso": 0, "tipo": "planta",   "x": 0.6,  "z": 0.4 },
+      { "piso": 0, "tipo": "planta",   "x": 2.8,  "z": 0.4, "escala": 0.8 },
+      { "piso": 0, "tipo": "tapete",   "x": 5.4,  "z": 2.6,  "w": 2.2, "d": 1.9 },
+      { "piso": 0, "tipo": "cama",     "x": 5.94, "z": 2.6,  "rot": -90, "ancho": 1.4 },
+      { "piso": 0, "tipo": "buro",     "x": 6.73, "z": 1.65, "rot": -90 },
+      { "piso": 0, "tipo": "buro",     "x": 6.73, "z": 3.55, "rot": -90 },
+      { "piso": 0, "tipo": "cama",     "x": 5.94, "z": 8.2,  "rot": -90, "ancho": 1.35 },
+      { "piso": 0, "tipo": "buro",     "x": 6.73, "z": 9.1,  "rot": -90 },
+      { "piso": 0, "tipo": "escritorio", "x": 4.15, "z": 8.4, "rot": 90 }
+    ]
+  }
+}

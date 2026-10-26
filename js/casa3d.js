@@ -92,6 +92,38 @@ const TEX = {
     }
     grano(c, s, 6000, .06, 1.5);
   }),
+  porcelanatoGris: () => canvasTex('porcelanatoGris', 1024, (c, s) => {     // 60x60 gris, como se entregan las casas nuevas
+    const n = 2, w = s / n;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { c.fillStyle = `hsl(30,${3 + Math.random() * 3}%,${62 + Math.random() * 5}%)`; c.fillRect(i * w, j * w, w, w); }
+    manchas(c, s, 140, .05, 70); grano(c, s, 9000, .04, 1.5);
+    c.strokeStyle = 'rgba(70,66,60,.55)'; c.lineWidth = 3;
+    for (let i = 0; i <= n; i++) { c.beginPath(); c.moveTo(i * w, 0); c.lineTo(i * w, s); c.moveTo(0, i * w); c.lineTo(s, i * w); c.stroke(); }
+  }),
+  estampado: () => canvasTex('estampado', 512, (c, s) => {                  // concreto estampado tipo piedra
+    c.fillStyle = '#6f6a63'; c.fillRect(0, 0, s, s);
+    for (let i = 0; i < 70; i++) {
+      const x = Math.random() * s, y = Math.random() * s, r = 22 + Math.random() * 30;
+      c.fillStyle = `hsl(32,${8 + Math.random() * 8}%,${52 + Math.random() * 16}%)`;
+      c.beginPath(); for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2, rr = r * (.75 + Math.random() * .3); c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.fill();
+    }
+    grano(c, s, 8000, .07, 1.5);
+  }),
+  piedra: () => canvasTex('piedra', 512, (c, s) => {                       // piedra laja en fachada
+    c.fillStyle = '#5c544a'; c.fillRect(0, 0, s, s);
+    let y = 0;
+    while (y < s) {
+      const h = 18 + Math.random() * 22; let x = -Math.random() * 40;
+      while (x < s) { const w = 40 + Math.random() * 90; c.fillStyle = `hsl(${28 + Math.random() * 14},${10 + Math.random() * 14}%,${38 + Math.random() * 26}%)`; c.fillRect(x + 2, y + 2, w - 4, h - 4); x += w; }
+      y += h;
+    }
+    grano(c, s, 9000, .08, 1.5);
+  }),
+  block: () => canvasTex('block', 512, (c, s) => {                         // block de concreto aparente
+    c.fillStyle = '#8f8b84'; c.fillRect(0, 0, s, s);
+    const w = s / 2, h = s / 4;
+    for (let r = 0; r < 4; r++) for (let k = -1; k < 3; k++) { c.fillStyle = `hsl(35,${3 + Math.random() * 3}%,${55 + Math.random() * 8}%)`; c.fillRect(k * w + (r % 2) * w / 2 + 3, r * h + 3, w - 6, h - 6); }
+    grano(c, s, 9000, .08, 1.5);
+  }),
   malla: () => canvasTex('malla', 128, (c, s) => {
     c.clearRect(0, 0, s, s); c.strokeStyle = 'rgba(200,205,210,1)'; c.lineWidth = 3;
     c.beginPath(); c.moveTo(0, 0); c.lineTo(s, s); c.moveTo(s, 0); c.lineTo(0, s); c.stroke();
@@ -102,7 +134,7 @@ const TEX = {
     c.fillStyle = g; c.fillRect(0, 0, s, s); grano(c, s, 20000, .02, 1);
   }),
 };
-const ESCALA_TEX = { azulejo: .8, porcelanato: 1.2, madera: 1.8, pasto: 2.2, concreto: 2.5, adoquin: 1.6, malla: .12 };
+const ESCALA_TEX = { azulejo: .8, porcelanato: 1.2, porcelanatoGris: 1.2, madera: 1.8, pasto: 2.2, concreto: 2.5, adoquin: 1.6, estampado: 2.4, piedra: 1.4, block: .8, malla: .12 };
 function tex(nombre, w, d) { const t = TEX[nombre](); const e = ESCALA_TEX[nombre] || 1; t.repeat.set(w / e, d / e); t.needsUpdate = true; return t; }
 
 // ───────────────────────── Materiales
@@ -152,6 +184,7 @@ function rectsMuro(u0, u1, H, huecos) {
 function alturasHueco(a) {
   if (a.tipo === 'puerta') return [0, a.alto || PUERTA];
   if (a.tipo === 'vano') return [0, a.alto || VANO];
+  if (a.tipo === 'ventanal') return [0, a.alto || 2.2];
   return [a.antepecho ?? .95, a.dintel || PUERTA];
 }
 
@@ -257,6 +290,45 @@ function mueble(f) {
       a(rcaja(.46, .06, .46, M.tela, .025), 0, .47, .5); a(rcaja(.46, .5, .05, M.tela, .025), 0, .75, .72);
       a(cil(.06, .08, .03, M.dorado, 16), .4, .785, -.12); a(cil(.008, .008, .4, M.dorado, 8), .4, .98, -.12);
       break;
+    case 'litera': {
+      const A = f.ancho || 1.0;
+      for (const yy of [0, 1.15]) {
+        a(rcaja(A - .04, .2, 1.92, M.sabana, .06), 0, .36 + yy, 0); a(rcaja(A - .06, .05, .9, M.cobija, .02), 0, .48 + yy, .45);
+        a(rcaja(A * .6, .1, .3, M.blanco, .04), 0, .5 + yy, -.75);
+      }
+      for (const x of [-A / 2, A / 2]) for (const z of [-.97, .97]) a(caja(.04, 2.0, .04, M.negro), x, 1.0, z);
+      for (const yy of [.25, 1.4]) { a(caja(A, .04, .04, M.negro), 0, yy, -.97); a(caja(A, .04, .04, M.negro), 0, yy, .97); a(caja(.04, .04, 1.94, M.negro), -A / 2, yy, 0); a(caja(.04, .04, 1.94, M.negro), A / 2, yy, 0); }
+      a(caja(A, .04, .04, M.negro), 0, 1.8, -.97); for (let i = 0; i < 4; i++) a(caja(.03, .03, .3, M.negro), A / 2, .5 + i * .3, .6);
+      break;
+    }
+    case 'lavadero':
+      a(rcaja(.75, .12, .6, std('#e9e7e2', { roughness: .5 }), .03), 0, .82, 0); a(caja(.7, .76, .5, std('#bdb8b0')), 0, .38, 0);
+      a(cil(.012, .012, .2, M.acero, 8), -.2, 1.0, -.25);
+      break;
+    case 'asador': {
+      const lad = std('#9a5a3c', { roughness: .9 });
+      a(rcaja(1.6, .9, .7, lad, .02), 0, .45, 0); a(caja(1.64, .06, .74, std('#cfc8bb', { roughness: .6 })), 0, .93, 0);
+      a(caja(.7, .02, .45, M.negro), -.3, .97, 0); a(rcaja(.75, .6, .5, lad, .02), -.3, 1.3, -.1);
+      a(caja(.25, .5, .25, lad), -.3, 1.85, -.1);
+      break;
+    }
+    case 'camastro': {
+      const bl = std('#EDE9E1', { roughness: .9 });
+      a(rcaja(.65, .12, 1.9, M.maderaClara, .03), 0, .3, 0); a(rcaja(.6, .1, 1.3, bl, .05), 0, .4, .25);
+      const resp = rcaja(.6, .1, .7, bl, .05); resp.rotation.x = -.6; a(resp, 0, .6, -.6);
+      for (const x of [-.28, .28]) for (const z of [-.85, .85]) a(caja(.04, .26, .04, M.negro), x, .13, z);
+      break;
+    }
+    case 'mesaExterior': {
+      a(rcaja(1.3, .05, .8, M.maderaClara, .02), 0, .74, 0);
+      for (const [x, z] of [[-.58, -.33], [.58, -.33], [-.58, .33], [.58, .33]]) a(caja(.04, .72, .04, M.negro), x, .36, z);
+      for (const [x, z, r] of [[-.33, -.62, 0], [.33, -.62, 0], [-.33, .62, Math.PI], [.33, .62, Math.PI]]) {
+        const s2 = new THREE.Group(); en(s2, rcaja(.45, .05, .45, std('#2b2b2e'), .02), 0, .45, 0); en(s2, rcaja(.45, .4, .04, std('#2b2b2e'), .02), 0, .68, -.2);
+        for (const [p2, q] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) en(s2, caja(.025, .45, .025, M.negro), p2, .22, q);
+        s2.position.set(x, 0, z); s2.rotation.y = r; g.add(s2);
+      }
+      break;
+    }
   }
   g.position.set(f.x, 0, f.z); g.rotation.y = (f.rot || 0) * Math.PI / 180;
   return g;
@@ -319,8 +391,9 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
   const ext = cfg.exterior || {}, fach = cfg.fachada;
 
   // ── Base tipo maqueta
+  const esDepto = cfg.tipo === 'departamento';
   {
-    const m = .55, x0 = -m, x1 = W + m, z0 = -1.25 - m, z1 = FONDO + m, r = .35;
+    const m = .55, x0 = -m, x1 = W + m, z0 = (esDepto ? 0 : -1.25) - m, z1 = FONDO + m, r = .35;
     const s = new THREE.Shape();
     s.moveTo(x0 + r, z0); s.lineTo(x1 - r, z0); s.quadraticCurveTo(x1, z0, x1, z0 + r); s.lineTo(x1, z1 - r); s.quadraticCurveTo(x1, z1, x1 - r, z1);
     s.lineTo(x0 + r, z1); s.quadraticCurveTo(x0, z1, x0, z1 - r); s.lineTo(x0, z0 + r); s.quadraticCurveTo(x0, z0, x0 + r, z0);
@@ -330,53 +403,78 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
     raiz.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: ORO, transparent: true, opacity: .65 })));
     const sombra = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: .35 }));
     sombra.rotation.x = -Math.PI / 2; sombra.position.y = -.36; sombra.receiveShadow = true; raiz.add(sombra);
-    const bq = caja(W + .4, .1, 1.2, std('#fff', { map: tex('concreto', W, 1.2), roughness: .9 })); bq.position.set(W / 2, .05, -.62); raiz.add(bq);
-    const guar = caja(W + .4, .14, .14, std('#c9c4bb')); guar.position.set(W / 2, .07, -1.25); raiz.add(guar);
+    if (!esDepto) {
+      const bq = caja(W + .4, .1, 1.2, std('#fff', { map: tex('concreto', W, 1.2), roughness: .9 })); bq.position.set(W / 2, .05, -.62); raiz.add(bq);
+      const guar = caja(W + .4, .14, .14, std('#c9c4bb')); guar.position.set(W / 2, .07, -1.25); raiz.add(guar);
+    }
   }
+  const grupoModo = m => m === 'actual' ? soloActual : soloRenovado;
+  const valorModo = (v, m, def) => v == null ? def : (typeof v === 'object' && !Array.isArray(v) && (v.actual !== undefined || v.renovado !== undefined) ? (v[m] ?? def) : v);
 
-  // ── Cochera
-  {
-    const pasto = caja(W, .05, Z0, std('#fff', { map: tex('pasto', W, Z0), roughness: 1 })); pasto.position.set(W / 2, .025, Z0 / 2); soloActual.add(pasto);
-    for (const x of cfg.auto ? [cfg.auto.x - .82, cfg.auto.x + .82] : [1.05, 3.05]) { const h = caja(.5, .06, Z0 - .2, std('#fff', { map: tex('concreto', .5, Z0) })); h.position.set(x, .03, Z0 / 2); soloActual.add(h); }
-    const piso = caja(W, .06, Z0, std('#fff', { map: tex('adoquin', W, Z0), roughness: .8 })); piso.position.set(W / 2, .03, Z0 / 2); soloRenovado.add(piso);
-    const jar = rcaja(1.25, .38, .42, std('#2A2A2E', { roughness: .5 }), .03); jar.position.set(.75, .19, Z0 - .35); soloRenovado.add(jar);
-    for (let i = 0; i < 4; i++) { const p = planta(.75); p.children[0].visible = false; p.position.set(.32 + i * .28, .2, Z0 - .35); soloRenovado.add(p); }
-    if (cfg.auto) { const a = auto(); a.position.set(cfg.auto.x, 0, cfg.auto.z); a.rotation.y = (cfg.auto.rot || 0) * Math.PI / 180; raiz.add(a); }
+  // ── Cochera (o andador al frente)
+  if (!esDepto && Z0 > .3) for (const modo of ['actual', 'renovado']) {
+    const tipo = valorModo(ext.cochera, modo, modo === 'actual' ? 'pasto' : 'adoquin'), dest = grupoModo(modo);
+    if (tipo === 'pasto') {
+      en(dest, caja(W, .05, Z0, std('#fff', { map: tex('pasto', W, Z0), roughness: 1 })), W / 2, .025, Z0 / 2);
+      const huellas = cfg.huellas || (cfg.auto ? [cfg.auto.x - .82, cfg.auto.x + .82] : [W * .23, W * .68]);
+      for (const x of huellas) en(dest, caja(.5, .06, Z0 - .2, std('#fff', { map: tex('concreto', .5, Z0) })), x, .03, Z0 / 2);
+    } else {
+      const t = tipo === 'concreto' ? 'concreto' : tipo === 'estampado' ? 'estampado' : 'adoquin';
+      en(dest, caja(W, .06, Z0, std('#fff', { map: tex(t, W, Z0), roughness: .8 })), W / 2, .03, Z0 / 2);
+    }
+    if (modo === 'renovado' && cfg.jardinera !== false) {
+      const jx = cfg.jardinera?.x ?? .75;
+      en(dest, rcaja(1.25, .38, .42, std('#2A2A2E', { roughness: .5 }), .03), jx, .19, Z0 - .35);
+      for (let i = 0; i < 4; i++) { const p = planta(.75); p.children[0].visible = false; p.position.set(jx - .43 + i * .28, .2, Z0 - .35); dest.add(p); }
+    }
+  }
+  if (cfg.auto && !esDepto) {
+    const modos = cfg.auto.modos || ['actual', 'renovado'];
+    for (const modo of modos) { const a = auto(); a.position.set(cfg.auto.x, 0, cfg.auto.z); a.rotation.y = (cfg.auto.rot || 0) * Math.PI / 180; grupoModo(modo).add(a); }
   }
   // ── Reja al frente
-  {
-    const g = new THREE.Group(); const mp = std('#a3a8ad', { metalness: .8, roughness: .35 });
-    for (let x = 0; x <= W + .01; x += W / 3) en(g, cil(.035, .035, 1.7, mp, 12), x, .85, .04);
-    const malla = new THREE.Mesh(new THREE.PlaneGeometry(W, 1.5), new THREE.MeshStandardMaterial({ map: tex('malla', W, 1.5), transparent: true, alphaTest: .4, side: THREE.DoubleSide, metalness: .7, roughness: .4 }));
-    malla.castShadow = true; en(g, malla, W / 2, .82, .04);
-    for (const y of [1.6, 1.72]) en(g, caja(W, .006, .006, mp), W / 2, y, .04);
-    soloActual.add(g);
-
-    const h = new THREE.Group(); const b = std('#141416', { metalness: .6, roughness: .35 });
-    en(h, rcaja(W, .4, .22, std('#2A2A2E', { roughness: .5 }), .02), W / 2, .2, .11);
-    for (let x = .06; x < W; x += .1) en(h, caja(.028, 1.45, .028, b), x, 1.12, .11);
-    en(h, caja(W, .05, .06, b), W / 2, 1.85, .11); en(h, caja(W, .015, .07, M.dorado), W / 2, 1.88, .11);
-    soloRenovado.add(h);
+  if (!esDepto) for (const modo of ['actual', 'renovado']) {
+    const tipo = valorModo(ext.reja, modo, 'ninguna'), dest = grupoModo(modo);
+    if (tipo === 'malla') {
+      const g = new THREE.Group(); const mp = std('#a3a8ad', { metalness: .8, roughness: .35 });
+      for (let x = 0; x <= W + .01; x += W / 3) en(g, cil(.035, .035, 1.7, mp, 12), x, .85, .04);
+      const malla = new THREE.Mesh(new THREE.PlaneGeometry(W, 1.5), new THREE.MeshStandardMaterial({ map: tex('malla', W, 1.5), transparent: true, alphaTest: .4, side: THREE.DoubleSide, metalness: .7, roughness: .4 }));
+      malla.castShadow = true; en(g, malla, W / 2, .82, .04);
+      for (const y of [1.6, 1.72]) en(g, caja(W, .006, .006, mp), W / 2, y, .04);
+      dest.add(g);
+    } else if (tipo === 'herreria') {
+      const h = new THREE.Group(); const b = std('#141416', { metalness: .6, roughness: .35 });
+      en(h, rcaja(W, .4, .22, std('#2A2A2E', { roughness: .5 }), .02), W / 2, .2, .11);
+      for (let x = .06; x < W; x += .1) en(h, caja(.028, 1.45, .028, b), x, 1.12, .11);
+      en(h, caja(W, .05, .06, b), W / 2, 1.85, .11); en(h, caja(W, .015, .07, M.dorado), W / 2, 1.88, .11);
+      dest.add(h);
+    }
   }
-  // ── Patio
-  {
+  // ── Patio trasero
+  if (!esDepto && ext.patio !== false && FONDO - Z1 > .3) {
     const PZ = Z1, PD = FONDO - PZ;
-    const pA = caja(W, .05, PD, std('#c9c6a8', { map: tex('pasto', W, PD), roughness: 1 })); pA.position.set(W / 2, .025, PZ + PD / 2); soloActual.add(pA);
-    const pR = caja(W, .05, PD, std('#fff', { map: tex('pasto', W, PD), roughness: 1 })); pR.position.set(W / 2, .025, PZ + PD / 2); soloRenovado.add(pR);
-    const deck = caja(W, .08, 1.1, std('#fff', { map: tex('madera', W, 1.1), roughness: .6 })); deck.position.set(W / 2, .045, PZ + .55); soloRenovado.add(deck);
-    const pa = ext.patio?.actual || {}, pr = ext.patio?.renovado || {};
-    const bA = pintura(pa.barda || '#888'), bR = pintura(pr.barda || '#eee');
-    for (const [w, d, x, z] of [[W, .15, W / 2, FONDO - .075], [.15, PD, .075, PZ + PD / 2], [.15, PD, W - .075, PZ + PD / 2]]) {
-      const b = caja(w, 2.4, d, bA); b.position.set(x, 1.2, z); doble(b, bA, bR); raiz.add(b);
-      const cap = caja(w + .04, .04, d + .04, std('#bdb8ae')); cap.position.set(x, 2.42, z); raiz.add(cap);
+    for (const modo of ['actual', 'renovado']) {
+      const pc = ext.patio?.[modo] || {}, dest = grupoModo(modo);
+      const pisoP = pc.piso || 'pasto';
+      en(dest, caja(W, .05, PD, std(modo === 'actual' && !pc.verde ? '#c9c6a8' : '#fff', { map: tex(pisoP, W, PD), roughness: 1 })), W / 2, .025, PZ + PD / 2);
+      if (pc.andador) en(dest, caja(pc.andador.w || 1, .06, PD, std('#fff', { map: tex('concreto', 1, PD) })), pc.andador.x, .03, PZ + PD / 2);
+      if (modo === 'renovado' && pc.deck !== false) en(dest, caja(W, .08, 1.1, std('#fff', { map: tex('madera', W, 1.1), roughness: .6 })), W / 2, .045, PZ + .55);
+      const mb = pc.bloque ? std('#fff', { map: tex('block', 1, 1), roughness: .95 }) : pintura(pc.barda || '#eee');
+      for (const [w, d, x, z] of [[W, .15, W / 2, FONDO - .075], [.15, PD, .075, PZ + PD / 2], [.15, PD, W - .075, PZ + PD / 2]]) {
+        const b = caja(w, pc.alto || 2.4, d, mb);
+        if (pc.bloque) { b.material = mb.clone(); b.material.map = tex('block', Math.max(w, d), pc.alto || 2.4); }
+        en(dest, b, x, (pc.alto || 2.4) / 2, z);
+        en(dest, caja(w + .04, .04, d + .04, std('#bdb8ae')), x, (pc.alto || 2.4) + .02, z);
+      }
+      if (pc.techo) {
+        const rej = new THREE.Group(); const m = std('#5a3d2c', { metalness: .6, roughness: .6 });
+        for (let x = 0; x <= W; x += .35) en(rej, caja(.022, .022, PD, m), x, 2.55, PZ + PD / 2);
+        for (let z = PZ; z <= FONDO; z += .35) en(rej, caja(W, .022, .022, m), W / 2, 2.55, z);
+        dest.add(rej);
+      }
+      if (modo === 'renovado' && pc.plantas !== false)
+        for (const [x, z, sc] of [[.45, FONDO - .45, 1.5], [W - .45, FONDO - .45, 1.3]]) { const p = planta(sc); p.position.set(x, .05, z); dest.add(p); }
     }
-    if (pa.techo) {
-      const rej = new THREE.Group(); const m = std('#5a3d2c', { metalness: .6, roughness: .6 });
-      for (let x = 0; x <= W; x += .35) en(rej, caja(.022, .022, PD, m), x, 2.55, PZ + PD / 2);
-      for (let z = PZ; z <= FONDO; z += .35) en(rej, caja(W, .022, .022, m), W / 2, 2.55, z);
-      soloActual.add(rej);
-    }
-    for (const [x, z, s] of [[.45, FONDO - .45, 1.5], [W - .45, FONDO - .45, 1.3], [W - .45, PZ + 1.5, 1]]) { const p = planta(s); p.position.set(x, .05, z); soloRenovado.add(p); }
   }
 
   // ── Habitaciones
@@ -439,7 +537,7 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
         if (h.eje === 'z') obj.position.set(uc, yy, h.en + off); else { obj.position.set(h.en + off, yy, uc); obj.rotation.y = Math.PI / 2; }
         destino.add(obj); return obj;
       };
-      if (h.tipo === 'ventana') {
+      if (h.tipo === 'ventana' || h.tipo === 'ventanal') {
         colocar(caja(L - .04, alto - .04, .012, M.vidrio, false));
         const mA = std('#ecebe7', { metalness: .4, roughness: .35 }), mR = std('#141416', { metalness: .55, roughness: .3 });
         const fr = new THREE.Group();
@@ -447,8 +545,8 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
           const m = caja(w, hh, .07, mA); m.position.set(x, yy, 0); doble(m, mA, mR); fr.add(m);
         }
         colocar(fr);
-        if (borde) colocar(caja(L + .12, .04, .16, std('#d8d3ca', { roughness: .5 })), fuera * (TE + .04), y + h.y0 - .02);   // repisón
-        if (frente) {                                  // protección de herrería (estado actual)
+        if (borde && h.tipo === 'ventana') colocar(caja(L + .12, .04, .16, std('#d8d3ca', { roughness: .5 })), fuera * (TE + .04), y + h.y0 - .02);   // repisón
+        if (frente && h.tipo === 'ventana' && fach.proteccion) {       // protección de herrería (estado actual)
           const rej = new THREE.Group(); const mr = std('#1b1b1d', { metalness: .6, roughness: .4 });
           for (let x = -L / 2 + .09; x < L / 2; x += .12) en(rej, caja(.016, alto, .016, mr), x, 0, 0);
           for (const yy of [-alto / 2 + .05, 0, alto / 2 - .05]) en(rej, caja(L, .02, .02, mr), 0, yy, 0);
@@ -472,7 +570,7 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
         if (h.eje === 'z') { piv.position.set(h.de + .015, yc, h.en + abre * (T + .03)); piv.rotation.y = -ang; }
         else { piv.position.set(h.en + abre * (T + .03), yc, h.de + .015); piv.rotation.y = -Math.PI / 2 + ang; }
         g.add(piv);
-        if (h.principal) {
+        if (h.principal && frente) {
           const lamp = new THREE.Group();
           en(lamp, caja(.1, .32, .08, M.dorado), 0, 0, 0);
           en(lamp, caja(.06, .02, .05, M.luzCalida, false), 0, -.17, -.02);
@@ -497,51 +595,124 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
     for (let x = q.de + .03; x < q.a - .02; x += .085) en(soloRenovado, caja(.05, q.y1 - q.y0, .05, mad), x, (q.y0 + q.y1) / 2, Z0 - TE - .04);
   }
 
-  // ── Escalera y barandales
-  if (cfg.escalera) {
-    const e = cfg.escalera, n = e.escalones, dz = (e.z1 - e.z0) / n, dy = NIV / n;
-    const mA = pintura(e.color.actual), mR = std('#fff', { map: tex('madera', e.w, dz), roughness: .5 });
-    const cuerpo = pintura('#d8d2c6');
-    for (let i = 0; i < n; i++) {
-      const zc = e.z0 + dz * (i + .5), hy = dy * (i + 1);
-      en(grupoPiso[0], caja(e.w - .02, hy - .04, dz, cuerpo), e.x + e.w / 2, (hy - .04) / 2, zc);
-      const hu = caja(e.w - .02, .04, dz + .03, mA); doble(hu, mA, mR); en(grupoPiso[0], hu, e.x + e.w / 2, hy - .02, zc - .015);
-    }
-    const xh = e.x + .04, largo = Math.hypot(e.z1 - e.z0, NIV);
-    const pmA = std('#e9e6df', { metalness: .3 }), pmR = std('#141416', { metalness: .6, roughness: .3 });
-    const pm = cil(.022, .022, largo, pmA, 10); doble(pm, pmA, pmR);
-    pm.position.set(xh, NIV / 2 + .9, (e.z0 + e.z1) / 2); pm.rotation.x = Math.atan2(e.z1 - e.z0, NIV); grupoPiso[0].add(pm);
-    for (let i = 1; i < n; i += 2) { const p = caja(.02, .9, .02, pmA); doble(p, pmA, pmR); en(grupoPiso[0], p, xh, dy * (i + 1) + .45, e.z0 + dz * (i + .5)); }
-  }
-  if (cfg.barandal) {
-    const b = cfg.barandal, y = b.piso * NIV;
-    const mA = std('#e9e6df', { metalness: .3 }), mR = std('#141416', { metalness: .6, roughness: .3 });
-    const top = caja(.05, .05, b.z1 - b.z0, mA); doble(top, mA, mR); en(grupoPiso[b.piso], top, b.x, y + .95, (b.z0 + b.z1) / 2);
-    for (let z = b.z0 + .05; z < b.z1; z += .11) { const p = caja(.018, .93, .018, mA); doble(p, mA, mR); en(grupoPiso[b.piso], p, b.x, y + .47, z); }
+  // ── Recubrimientos de fachada (piedra, volúmenes de color, madera)
+  for (const q of fach.paneles || []) {
+    const mat = q.material === 'piedra' ? std('#fff', { map: tex('piedra', q.a - q.de, q.y1 - q.y0), roughness: .95 })
+      : q.material === 'madera' ? std('#c79a6a', { map: tex('madera', q.a - q.de, q.y1 - q.y0), roughness: .55 })
+      : pintura(q.color || '#8d8e8c');
+    const sal = q.saliente ?? .05;
+    const pan = caja(q.a - q.de, q.y1 - q.y0, sal, mat);
+    const dest = q.modo ? grupoModo(q.modo) : raiz;
+    en(dest, pan, (q.de + q.a) / 2, (q.y0 + q.y1) / 2, Z0 - TE - sal / 2);
   }
 
-  // ── Azotea
-  {
-    const y = ALTO, P = cfg.casa.pretil, D = Z1 - Z0;
-    en(techo, caja(W + 2 * TE, LOSA, D + 2 * TE, std('#fff', { map: tex('concreto', W, D), roughness: .9 })), W / 2, y - LOSA / 2, Z0 + D / 2);
-    const iA = std('#9e3b2a', { roughness: .9 }), iR = std('#8c8780', { roughness: .9 });
-    const imp = caja(W, .01, D, iA, false); doble(imp, iA, iR); en(techo, imp, W / 2, y + .005, Z0 + D / 2);
-    const [fA, fR] = [pintura(fach.actual.alta), pintura(fach.renovado.alta)];
-    const capA = std('#c9c2b5', { roughness: .6 }), capR = std('#1d1d20', { roughness: .4, metalness: .3 });
-    for (const [w, d, x, z] of [[W + 2 * TE, .15, W / 2, Z0 - TE + .075], [W + 2 * TE, .15, W / 2, Z1 + TE - .075], [.15, D, -TE + .075, Z0 + D / 2], [.15, D, W + TE - .075, Z0 + D / 2]]) {
-      const p = caja(w, P, d, fA); doble(p, fA, fR); en(techo, p, x, y + P / 2, z);
-      const c = caja(w + .03, .05, d + .03, capA); doble(c, capA, capR); en(techo, c, x, y + P + .025, z);
+  // ── Balcones
+  const metalA = std('#151517', { metalness: .6, roughness: .35 });
+  for (const b of cfg.balcones || []) {
+    const y = b.piso * NIV, g = grupoPiso[b.piso];
+    const losa = caja(b.w, LOSA, b.d, std('#fff', { map: tex(b.piso_ || 'porcelanatoGris', b.w, b.d), roughness: .5 }));
+    en(g, losa, b.x + b.w / 2, y - LOSA / 2, b.z + b.d / 2);
+    const alto = b.alto || 1.0, lados = [];
+    if (b.z + b.d <= Z0 + .01) lados.push(['z', b.z + .02, b.x, b.x + b.w], ['x', b.x + .02, b.z, b.z + b.d], ['x', b.x + b.w - .02, b.z, b.z + b.d]);
+    else lados.push(['z', b.z + b.d - .02, b.x, b.x + b.w], ['x', b.x + .02, b.z, b.z + b.d], ['x', b.x + b.w - .02, b.z, b.z + b.d]);
+    for (const [eje, v, a, c] of lados) {
+      const L = c - a, uc = (a + c) / 2;
+      const top = eje === 'z' ? caja(L, .05, .05, metalA) : caja(.05, .05, L, metalA);
+      top.position.set(eje === 'z' ? uc : v, y + alto, eje === 'z' ? v : uc); g.add(top);
+      for (let u = a + .06; u < c - .02; u += .11) { const p = caja(.02, alto, .02, metalA); p.position.set(eje === 'z' ? u : v, y + alto / 2, eje === 'z' ? v : u); g.add(p); }
     }
-    en(soloRenovado, caja(W + 2 * TE + .02, .045, .03, M.dorado), W / 2, NIV - .02, Z0 - TE - .015);
-    const tin = new THREE.Group();
-    en(tin, cil(.52, .55, 1.15, std('#1f1f22', { roughness: .5 }), 32), 0, .62, 0); en(tin, cil(.3, .52, .16, std('#1f1f22', { roughness: .5 }), 32), 0, 1.27, 0);
-    en(tin, caja(1.2, .1, 1.2, std('#9b968e')), 0, .05, 0);
-    tin.position.set(W - .85, y, Z1 - .9); techo.add(tin);
+  }
+
+  // ── Escaleras y barandales
+  const escaleras = cfg.escaleras || (cfg.escalera ? [{ piso: 0, ...cfg.escalera }] : []);
+  for (const e of escaleras) {
+    const g = grupoPiso[e.piso] || techo, yb = e.piso * NIV, n = e.escalones || 13;
+    const dz = (e.z1 - e.z0) / n, dy = NIV / n, baja = e.sube === '-z';
+    const col = e.color || { actual: '#CFC6B8', renovado: 'madera' };
+    const mA = col.actual === 'madera' ? std('#fff', { map: tex('madera', e.w, dz), roughness: .5 }) : pintura(col.actual);
+    const mR = col.renovado === 'madera' ? std('#fff', { map: tex('madera', e.w, dz), roughness: .5 }) : pintura(col.renovado);
+    const cuerpo = pintura('#d8d2c6');
+    for (let i = 0; i < n; i++) {
+      const zc = baja ? e.z1 - dz * (i + .5) : e.z0 + dz * (i + .5), hy = dy * (i + 1);
+      en(g, caja(e.w - .02, hy - .04, dz, cuerpo), e.x + e.w / 2, yb + (hy - .04) / 2, zc);
+      const hu = caja(e.w - .02, .04, dz + .03, mA); doble(hu, mA, mR); en(g, hu, e.x + e.w / 2, yb + hy - .02, zc + (baja ? .015 : -.015));
+    }
+    if (e.pasamanos !== false) {
+      const xh = e.pasamanos === 'E' ? e.x + e.w - .04 : e.x + .04, largo = Math.hypot(e.z1 - e.z0, NIV);
+      const pmA = std('#e9e6df', { metalness: .3 }), pmR = std('#141416', { metalness: .6, roughness: .3 });
+      const pm = cil(.022, .022, largo, pmA, 10); doble(pm, pmA, pmR);
+      pm.position.set(xh, yb + NIV / 2 + .9, (e.z0 + e.z1) / 2); pm.rotation.x = (baja ? -1 : 1) * Math.atan2(e.z1 - e.z0, NIV); g.add(pm);
+      for (let i = 1; i < n; i += 2) {
+        const p = caja(.02, .9, .02, pmA); doble(p, pmA, pmR);
+        en(g, p, xh, yb + dy * (i + 1) + .45, baja ? e.z1 - dz * (i + .5) : e.z0 + dz * (i + .5));
+      }
+    }
+  }
+  const barandales = cfg.barandales || (cfg.barandal ? [cfg.barandal] : []);
+  for (const b of barandales) {
+    const y = b.piso * NIV, g = grupoPiso[b.piso] || techo;
+    const mA = std('#e9e6df', { metalness: .3 }), mR = std('#141416', { metalness: .6, roughness: .3 });
+    const ejeX = b.eje === 'x';                       // eje "x": barandal a lo ancho en z = b.z, de x0 a x1
+    const a0 = ejeX ? b.x0 : b.z0, a1 = ejeX ? b.x1 : b.z1, L = a1 - a0;
+    const top = ejeX ? caja(L, .05, .05, mA) : caja(.05, .05, L, mA); doble(top, mA, mR);
+    en(g, top, ejeX ? (a0 + a1) / 2 : b.x, y + .95, ejeX ? b.z : (a0 + a1) / 2);
+    for (let u = a0 + .05; u < a1; u += .11) { const p = caja(.018, .93, .018, mA); doble(p, mA, mR); en(g, p, ejeX ? u : b.x, y + .47, ejeX ? b.z : u); }
+  }
+
+  // ── Azotea (normal, o roof garden)
+  const az = cfg.azotea || {}, roofGarden = az.tipo === 'roofGarden';
+  {
+    const y = ALTO, D = Z1 - Z0, P = roofGarden ? (az.pretil ?? 1.0) : (cfg.casa.pretil ?? .6);
+    en(techo, caja(W + 2 * TE, LOSA, D + 2 * TE, std('#fff', { map: tex('concreto', W, D), roughness: .9 })), W / 2, y - LOSA / 2, Z0 + D / 2);
+    if (roofGarden) {
+      en(techo, caja(W, .02, D, std('#fff', { map: tex(az.piso || 'madera', W, D), roughness: .5 }), false), W / 2, y + .01, Z0 + D / 2);
+    } else if (!esDepto) {
+      const iA = std('#9e3b2a', { roughness: .9 }), iR = std('#8c8780', { roughness: .9 });
+      const imp = caja(W, .01, D, iA, false); doble(imp, iA, iR); en(techo, imp, W / 2, y + .005, Z0 + D / 2);
+    }
+    if (P > 0) {
+      const [fA, fR] = [pintura(fach.actual.alta), pintura(fach.renovado.alta)];
+      const capA = std('#c9c2b5', { roughness: .6 }), capR = std('#1d1d20', { roughness: .4, metalness: .3 });
+      for (const [w, d, x, z] of [[W + 2 * TE, .15, W / 2, Z0 - TE + .075], [W + 2 * TE, .15, W / 2, Z1 + TE - .075], [.15, D, -TE + .075, Z0 + D / 2], [.15, D, W + TE - .075, Z0 + D / 2]]) {
+        const p = caja(w, P, d, fA); doble(p, fA, fR); en(techo, p, x, y + P / 2, z);
+        const c = caja(w + .03, .05, d + .03, capA); doble(c, capA, capR); en(techo, c, x, y + P + .025, z);
+      }
+    }
+    if (!esDepto) en(soloRenovado, caja(W + 2 * TE + .02, .045, .03, M.dorado), W / 2, NIV - .02, Z0 - TE - .015);
+    if (roofGarden && az.cuarto) {                   // cuarto de azotea (llegada de la escalera)
+      const q = az.cuarto, h = q.alto || 2.4, g = new THREE.Group();
+      const [mA, mR] = [pintura(fach.actual.alta), pintura(fach.renovado.alta)];
+      const pu = q.puerta ? [{ eje: 'z', en: q.z, de: q.puerta.de, a: q.puerta.a, y0: 0, y1: 2.2 }] : [];
+      muro(g, 'z', q.z, q.x, q.x + q.w, .06, .12, pu, mA, mR, y, h);
+      muro(g, 'z', q.z + q.d, q.x, q.x + q.w, -.06, .12, [], mA, mR, y, h);
+      muro(g, 'x', q.x, q.z, q.z + q.d, .06, .12, [], mA, mR, y, h);
+      muro(g, 'x', q.x + q.w, q.z, q.z + q.d, -.06, .12, [], mA, mR, y, h);
+      en(g, caja(q.w + .1, .12, q.d + .1, std('#bdb8ae')), q.x + q.w / 2, y + h + .06, q.z + q.d / 2);
+      if (q.puerta) {
+        const L = q.puerta.a - q.puerta.de;
+        en(g, caja(L - .04, 2.16, .012, M.vidrio, false), q.puerta.de + L / 2, y + 1.1, q.z + .06);
+        for (const [w, hh, x, yy] of [[L, .05, 0, 2.18], [.05, 2.2, -L / 2, 1.1], [.05, 2.2, L / 2, 1.1], [.035, 2.2, 0, 1.1]]) en(g, caja(w, hh, .07, metalA), q.puerta.de + L / 2 + x, y + yy, q.z + .06);
+      }
+      techo.add(g);
+    }
+    if (roofGarden && az.pergola) {
+      const q = az.pergola, h = q.alto || 2.5, mad = std('#3b2a1e', { roughness: .6 });
+      for (const [x, z] of [[q.x + .08, q.z + .08], [q.x + q.w - .08, q.z + .08], [q.x + .08, q.z + q.d - .08], [q.x + q.w - .08, q.z + q.d - .08]]) en(techo, caja(.12, h, .12, metalA), x, y + h / 2, z);
+      for (const z of [q.z + .08, q.z + q.d - .08]) en(techo, caja(q.w, .14, .08, metalA), q.x + q.w / 2, y + h - .07, z);
+      for (let x = q.x + .12; x < q.x + q.w; x += .3) en(techo, caja(.06, .1, q.d + .2, mad), x, y + h + .05, q.z + q.d / 2);
+    }
+    if (!roofGarden && !esDepto && cfg.casa.tinaco !== false) {
+      const tin = new THREE.Group();
+      en(tin, cil(.52, .55, 1.15, std('#1f1f22', { roughness: .5 }), 32), 0, .62, 0); en(tin, cil(.3, .52, .16, std('#1f1f22', { roughness: .5 }), 32), 0, 1.27, 0);
+      en(tin, caja(1.2, .1, 1.2, std('#9b968e')), 0, .05, 0);
+      tin.position.set(W - .85, y, Z1 - .9); techo.add(tin);
+    }
   }
 
   // ── Muebles
   for (const modo of ['actual', 'renovado']) for (const f of cfg.muebles?.[modo] || []) {
-    const m = mueble(f); m.position.y += f.piso * NIV; m.userData.modo = modo; grupoPiso[f.piso].add(m);
+    const m = mueble(f); m.position.y += f.piso * NIV; m.userData.modo = modo;
+    (grupoPiso[f.piso] || techo).add(m);
   }
 
   // ── Etiquetas HTML
@@ -567,31 +738,40 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
   }
 
   // ── Estado, vistas y cámara
+  const modos = { actual: cfg.modos?.actual || 'Así está', renovado: cfg.modos?.renovado || 'Así podría quedar' };
+  const listaVistas = [{ id: 'fachada', nombre: cfg.vistaGeneral || (esDepto ? 'Vista general' : 'Fachada') }];
+  cfg.pisos.forEach((p, i) => listaVistas.push({ id: 'p' + i, nombre: p.nombre || `Nivel ${i + 1}` }));
+  if (roofGarden) listaVistas.push({ id: 'azotea', nombre: az.nombre || 'Roof garden' });
   let modo = 'actual', vista = 'fachada', camAnim = null, margenInf = 0;
   const corte = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  const D = Z1 - Z0, zc = Z0 + D / 2;
+  const tam = Math.max(1, Math.max(W * 1.55, D) / 8, (ALTO + (roofGarden ? 2.4 : 0)) / 6.2);     // escala de cámara según el tamaño
   const vistas = {
-    fachada: { pos: new THREE.Vector3(W / 2 - 7.2, 4.6, -8.2), target: new THREE.Vector3(W / 2, 2.6, Z0 + 1.5) },
-    alta:    { pos: new THREE.Vector3(W / 2 + 2.2, NIV + 13.5, (Z0 + Z1) / 2 - 7), target: new THREE.Vector3(W / 2, NIV, (Z0 + Z1) / 2 + .2) },
-    baja:    { pos: new THREE.Vector3(W / 2 + 2.2, 13.5, (Z0 + Z1) / 2 - 7), target: new THREE.Vector3(W / 2, 0, (Z0 + Z1) / 2 + .2) },
+    fachada: { pos: new THREE.Vector3(W / 2 - 7.2 * tam, Math.min(ALTO, 6) * .5 + 2.2 * tam, Z0 - 9.7 * tam), target: new THREE.Vector3(W / 2, Math.min(ALTO * .5, 3.4), Z0 + 1.5) },
+    azotea:  { pos: new THREE.Vector3(W / 2 - 4, ALTO + 10, Z0 - 7.5), target: new THREE.Vector3(W / 2, ALTO, zc) },
   };
+  const tamP = Math.max(1, Math.max(W * 1.55, D) / 8);                                          // en plantas solo importa el tamaño en planta
+  cfg.pisos.forEach((_, i) => { vistas['p' + i] = { pos: new THREE.Vector3(W / 2 + 2.2, i * NIV + 13.5 * tamP, zc - 7 * tamP), target: new THREE.Vector3(W / 2, i * NIV, zc + .2) }; });
   const posDe = v => {
     const p = vistas[v]; const k = v === 'fachada' ? (camera.aspect > 1 ? 1 : 1.05) : (camera.aspect > 1 ? 1.32 : 1.04);
     return p.target.clone().add(p.pos.clone().sub(p.target).multiplyScalar(k));
   };
+  controls.maxDistance = 38 * tam;
   controls.addEventListener('start', () => { controls.autoRotate = false; camAnim = null; });
 
   function aplicar() {
     for (const v of variantes) v.mesh.material = v[modo];
     soloActual.visible = modo === 'actual'; soloRenovado.visible = modo === 'renovado';
+    const nivel = vista.startsWith('p') ? +vista.slice(1) : -1;
     grupoPiso.forEach((g, i) => {
-      g.visible = vista !== 'baja' || i === 0;
+      g.visible = nivel < 0 || i <= nivel;
       g.children.forEach(ch => { if (ch.userData.modo) ch.visible = ch.userData.modo === modo; });
     });
-    techo.visible = vista === 'fachada';
+    techo.visible = nivel < 0;
+    techo.children.forEach(ch => { if (ch.userData.modo) ch.visible = ch.userData.modo === modo; });
     // corte de sección: en las plantas los muros se cortan a 1.55 m para ver adentro
-    if (vista === 'fachada') renderer.clippingPlanes = [];
-    else { corte.constant = (vista === 'alta' ? NIV : 0) + 1.55; renderer.clippingPlanes = [corte]; }
-    const nivel = vista === 'alta' ? nPisos - 1 : vista === 'baja' ? 0 : -1;
+    if (nivel < 0) renderer.clippingPlanes = [];
+    else { corte.constant = nivel * NIV + 1.55; renderer.clippingPlanes = [corte]; }
     for (const e of etiquetas) e.activa = e.nivel === nivel;
   }
   function irA(v, dur = 1.2) { camAnim = { from: camera.position.clone(), fromT: controls.target.clone(), to: posDe(v), toT: vistas[v].target.clone(), t: 0, dur }; }
@@ -647,6 +827,7 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
     setModo(m) { modo = m; aplicar(); },
     setVista(v) { vista = v; aplicar(); irA(v); controls.autoRotate = false; },
     setMargenInferior(px) { margenInf = px; ajustar(); },
+    vistas: listaVistas, modos,
     girar(on) { controls.autoRotate = on; },
     destruir() { vivo = false; ro.disconnect(); composer?.dispose?.(); renderer.dispose(); pmrem.dispose(); contenedor.innerHTML = ''; },
   };

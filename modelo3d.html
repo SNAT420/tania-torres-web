@@ -34,6 +34,7 @@
     .seg button { font: inherit; font-size: .84rem; color: var(--text-muted); background: none; border: 0; border-radius: 9px; padding: .62rem .4rem; cursor: pointer; transition: background .2s, color .2s; white-space: nowrap; }
     .seg button:hover { color: var(--text); }
     .seg button[aria-pressed="true"] { background: var(--gold); color: #12100c; font-weight: 600; }
+    .seg.muchas button { font-size: .74rem; white-space: normal; line-height: 1.15; padding: .5rem .2rem; }
     .seg.secundario button[aria-pressed="true"] { background: rgba(201,169,110,.16); color: var(--gold-light); box-shadow: inset 0 0 0 1px var(--border-hover); }
     .pie { display: flex; align-items: center; gap: 12px; }
     .nota { flex: 1; font-size: .7rem; color: var(--text-muted); line-height: 1.45; }
@@ -89,11 +90,7 @@
       <button data-modo="actual" aria-pressed="true">Así está</button>
       <button data-modo="renovado" aria-pressed="false">Así podría quedar</button>
     </div>
-    <div class="seg secundario" role="group" aria-label="Vista">
-      <button data-vista="fachada" aria-pressed="true">Fachada</button>
-      <button data-vista="alta" aria-pressed="false">Planta alta</button>
-      <button data-vista="baja" aria-pressed="false">Planta baja</button>
-    </div>
+    <div class="seg secundario" role="group" aria-label="Vista" id="seg-vistas"></div>
     <div class="pie">
       <p class="nota" id="nota"></p>
       <a class="wa" id="wa" href="https://wa.me/5213322775288" target="_blank" rel="noopener">
@@ -159,6 +156,12 @@
           document.querySelectorAll('[data-modo]').forEach(x => x.setAttribute('aria-pressed', x === b));
           visor.setModo(b.dataset.modo);
         }));
+        // Botones según la propiedad: nombres de los modos y una vista por nivel
+        document.querySelector('[data-modo="actual"]').textContent = visor.modos.actual;
+        document.querySelector('[data-modo="renovado"]').textContent = visor.modos.renovado;
+        const segV = document.getElementById('seg-vistas');
+        segV.innerHTML = visor.vistas.map((v, i) => `<button data-vista="${v.id}" aria-pressed="${i === 0}">${v.nombre}</button>`).join('');
+        if (visor.vistas.length > 4) segV.classList.add('muchas');
         document.querySelectorAll('[data-vista]').forEach(b => b.addEventListener('click', () => {
           document.querySelectorAll('[data-vista]').forEach(x => x.setAttribute('aria-pressed', x === b));
           visor.setVista(b.dataset.vista);

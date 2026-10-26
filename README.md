@@ -17,7 +17,9 @@ Sitio web de Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolit
 
 - Cada casa con 3D tiene un archivo en `modelos/<modelo>.json` con sus medidas: cuartos, puertas, ventanas, escalera, colores actuales y la propuesta de remodelación con muebles.
 - El visor (`modelo3d.html` + `js/casa3d.js`) arma la casa en tiempo real con Three.js. Tiene los botones "Así está" / "Así podría quedar" y las vistas Fachada / Planta alta / Planta baja.
-- Para mostrar el botón "Ver en 3D" en una propiedad, en el panel de admin pon el nombre del archivo (sin `.json`) en el campo **Modelo 3D**. Ejemplo: `casa-tonala-2rec`.
+- Para mostrar el botón "Ver en 3D" en una propiedad hay dos formas: en el panel de admin, poner el nombre del archivo (sin `.json`) en el campo **Modelo 3D**, o agregar la propiedad en `modelos/propiedades.json` (id de Firestore → modelo). A las propiedades vendidas no se les muestra.
+- Modelos actuales: `la-arboleda-magenta`, `viande-tlaquepaque` (departamento), `tierra-residencial-zapopan` (3 niveles + roof garden) y `casa-tonala-2rec` (aún sin publicar).
+- Tipos y extras: `"tipo": "departamento"`, `modos` (nombres de los botones), `balcones`, `escaleras` (una por nivel), `barandales`, `fachada.paneles` (piedra, color, madera), `azotea.tipo: "roofGarden"` con `cuarto` y `pergola`, aberturas `ventanal`, y muebles como `litera`, `lavadero`, `asador`, `camastro`, `mesaExterior`.
 - Medidas en metros. `x` se mide desde la izquierda viendo la casa desde la calle, `z` desde la banqueta hacia el fondo.
 - Si las medidas son aproximadas, deja `"aproximado": true` para que el visor lo diga.
 - Extras opcionales del JSON: `auto` (coche en la cochera), `fachada.marquesina` y `fachada.listones` (detalles de la fachada renovada), y `abre: "+" | "-"` en cada puerta para el lado hacia donde abre.

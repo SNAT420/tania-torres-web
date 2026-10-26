@@ -1947,6 +1947,10 @@ async function compressImage(file, maxPx = 900, quality = 0.65) {
 // ESTADO LOCAL (caché en memoria)
 // ════════════════════════════════════════════════════════
 let allProps   = [];
+// Modelos 3D: el campo "modelo3d" de la propiedad (panel) o el mapa /modelos/propiedades.json (id → modelo)
+let mapa3d = {};
+const modelo3dDe = p => String(p.modelo3d || mapa3d[p.id] || '').replace(/[^a-z0-9-]/gi, '');
+fetch('/modelos/propiedades.json').then(r => r.ok ? r.json() : {}).then(m => { mapa3d = m || {}; if (allProps.length) renderProps(); }).catch(() => {});
 let allReviews = [];
 let siteSettings = { phone:'+52 33 2277 5288', email:'taniatorresvivar@gmail.com', wa:'5213322775288', profilePhoto:'' };
 
@@ -1977,7 +1981,7 @@ function renderProps() {
     return `<div class="prop-card${sold ? ' is-sold' : ''}" onclick="window.openPropModal('${p.id}')">
       ${imgHTML}
       <span class="prop-badge ${sold ? 'vendida' : p.type}">${sold ? 'Vendida' : (p.type === 'venta' ? 'En Venta' : 'En Renta')}</span>
-      ${p.modelo3d && !sold ? '<span class="prop-badge-3d">3D</span>' : ''}
+      ${modelo3dDe(p) && !sold ? '<span class="prop-badge-3d">3D</span>' : ''}
       <div class="prop-body">
         <div class="prop-price">${fmt(p.price, p.type)}</div>
         <div class="prop-title">${p.title}</div>
@@ -2035,7 +2039,8 @@ window.openPropModal = function(id) {
   document.getElementById('modal-desc').textContent = p.description || 'Contáctanos para más información.';
   document.getElementById('modal-wa').href = `https://wa.me/${siteSettings.wa}?text=Hola Tania, me interesa la propiedad: ${p.title}`;
   const btn3d = document.getElementById('modal-3d');
-  const slug3d = String(p.modelo3d || '').replace(/[^a-z0-9-]/gi, '');
+  const vendida = /^\s*vendid[ao]/i.test(p.description || '') || p.status === 'vendida';
+  const slug3d = vendida ? '' : modelo3dDe(p);
   btn3d.hidden = !slug3d;
   if (slug3d) btn3d.href = `/modelo3d?m=${slug3d}`;
 

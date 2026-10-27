@@ -44,5 +44,27 @@
       "/img/propiedades/la-arboleda-09.jpg",
       "/img/propiedades/la-arboleda-10.jpg"
     ]
+  },
+  {
+    "slug": "casa-tonala-jardines-reyna",
+    "title": "Casa en Tonalá",
+    "type": "venta",
+    "price": 1200000,
+    "location": "Jardines de la Reyna, Tonalá, Jalisco",
+    "beds": 2,
+    "baths": 1.5,
+    "size": 0,
+    "parking": 1,
+    "modelo3d": "casa-tonala-2rec",
+    "description": "Casa en venta en Jardines de la Reyna, Tonalá. Precio: $1,200,000.\n\n• 2 recámaras\n• 1½ baños\n• Sala-comedor\n• Cocina\n• Patio\n• Cochera\n\nRecórrela en 3D y mira cómo podría quedar remodelada.\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/tonala-jardines-reyna-01.jpg",
+      "/img/propiedades/tonala-jardines-reyna-02.jpg",
+      "/img/propiedades/tonala-jardines-reyna-03.jpg",
+      "/img/propiedades/tonala-jardines-reyna-04.jpg",
+      "/img/propiedades/tonala-jardines-reyna-05.jpg",
+      "/img/propiedades/tonala-jardines-reyna-06.jpg",
+      "/img/propiedades/tonala-jardines-reyna-07.jpg"
+    ]
   }
 ]

@@ -66,5 +66,20 @@
       "/img/propiedades/tonala-jardines-reyna-06.jpg",
       "/img/propiedades/tonala-jardines-reyna-07.jpg"
     ]
+  },
+  {
+    "slug": "puerta-real-tlajomulco",
+    "title": "Casa en Puerta Real, Tlajomulco",
+    "type": "venta",
+    "price": 680000,
+    "location": "Puerta Real, Tlajomulco de Zúñiga, Jalisco",
+    "beds": 1,
+    "baths": 1,
+    "size": 0,
+    "parking": 1,
+    "description": "Casa en venta en Puerta Real, Tlajomulco. Precio: $680,000.\n\n• 1 recámara + alcoba\n• Sala-comedor\n• Cocina\n• Baño\n• Patio\n• Cochera\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/puerta-real-01.jpg"
+    ]
   }
 ]

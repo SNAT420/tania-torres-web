@@ -10,6 +10,7 @@ Sitio web de Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolit
 
 - Prospectos por etapa, citas con botón a Google Calendar y mensajes de Instagram y Facebook.
 - Entra con la misma cuenta admin de Firebase (taniatorresvivar@gmail.com).
+- Pestaña **Reels**: banco de ideas, calendario y estado de cada Reel. Las ideas base están en `panel.html`; los cambios y las ideas nuevas se guardan en Firestore (`reels`).
 - Los mensajes llegan por ManyChat a `/api/manychat` y se guardan en Firestore (`inbox`).
 - Variables en Vercel: `PANEL_WEBHOOK_TOKEN` y `FIREBASE_SERVICE_ACCOUNT`.
 

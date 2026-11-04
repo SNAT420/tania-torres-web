@@ -48,5 +48,8 @@ service cloud.firestore {
     match /inbox/{id} {
       allow read, update, delete: if isAdmin();
     }
+    match /reels/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }

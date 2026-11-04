@@ -177,6 +177,20 @@ img{max-width:100%}
 .msg-thread{display:grid;gap:6px;margin-top:6px}
 .bubble{background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}
 .bubble small{display:block;color:var(--muted);font-size:11px}
+/* reels */
+.reel-series{display:grid;gap:10px}
+.reel-series>h3{font-family:var(--serif);font-weight:500;font-size:20px}
+.reel-series>p{margin:0;color:var(--muted);font-size:13px}
+.reel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+.reel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.reel .t{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.reel .t b{flex:1 1 140px;min-width:0;overflow-wrap:anywhere}
+.reel .hook{font-family:var(--serif);font-size:17px;line-height:1.3;overflow-wrap:anywhere}
+.reel .how{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.reel .foot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:2px}
+.reel select,.row select.reel-st{font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);min-width:0}
+.reel select{flex:1 1 110px}
+.rules{margin:10px 0 0;padding-left:20px;display:grid;gap:6px;font-size:13px}
 .row.unread .who b::after{content:"Nuevo";margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700}
 </style>
 </head>
@@ -206,6 +220,7 @@ img{max-width:100%}
     <a href="#mensajes" data-tab="mensajes">Mensajes<span class="n" id="nInbox" hidden></span></a>
     <a href="#prospectos" data-tab="prospectos">Prospectos</a>
     <a href="#citas" data-tab="citas">Citas</a>
+    <a href="#reels" data-tab="reels">Reels<span class="n" id="nReels" hidden></span></a>
     <a href="#redes" data-tab="redes">Redes</a>
   </nav>
 </header>
@@ -276,6 +291,40 @@ img{max-width:100%}
         <div class="list" id="dayList"></div>
       </div>
     </div>
+  </section>
+
+  <!-- REELS -->
+  <section class="view" id="v-reels" hidden>
+    <div class="h"><h2>Reels</h2><span class="sub" id="reelSub"></span>
+      <div class="acts"><a class="btn" href="https://app.metricool.com" target="_blank" rel="noopener">Abrir Metricool</a><button class="btn primary" type="button" id="btnNewReel">+ Nueva idea</button></div></div>
+    <div class="banner" id="reelBanner" hidden><span>Puedes ver las ideas, pero los cambios no se guardan todavía. Falta publicar en Firebase las reglas nuevas de Firestore (colección <b>reels</b>).</span></div>
+    <div class="two">
+      <div class="panel">
+        <div class="h"><h2>Calendario</h2><span class="sub">Lo que sigue por publicar</span></div>
+        <div class="list" id="reelCal"></div>
+      </div>
+      <div class="panel">
+        <div class="h"><h2>Reglas de cada Reel</h2></div>
+        <ol class="rules">
+          <li>Una sola idea, de 15 a 30 segundos, que se entienda sin sonido.</li>
+          <li>Abre con la mejor toma o con Tania a cámara. Nunca con logo.</li>
+          <li>Gancho en pantalla en los primeros 2 segundos, máximo 7 palabras.</li>
+          <li>Un corte cada 1 o 2 segundos cuando son fotos o tomas de la casa.</li>
+          <li>Subtítulos siempre, en negro y dorado.</li>
+          <li>Cierre de 2 segundos: "Escríbeme por WhatsApp: 33 2277 5288".</li>
+          <li>Solo municipio, nunca el nombre del fraccionamiento.</li>
+          <li>Tania confirma precios, medidas y créditos antes de publicar.</li>
+          <li>Metricool no agrega música a Facebook: el video se sube con su audio o se publica desde la app.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input id="rq" type="search" placeholder="Buscar idea o gancho" aria-label="Buscar idea">
+      <select id="rSerie" aria-label="Serie"><option value="">Todas las series</option></select>
+      <select id="rWho" aria-label="Cómo se hace"><option value="">Cualquier formato</option></select>
+      <select id="rStatus" aria-label="Estado"><option value="">Todos los estados</option></select>
+    </div>
+    <div id="reelList" style="display:grid;gap:24px"></div>
   </section>
 
   <!-- REDES -->
@@ -392,7 +441,7 @@ function gcalLink(a){
 }
 
 /* ---------- tabs ---------- */
-const TABS = ["hoy","mensajes","prospectos","citas","redes"];
+const TABS = ["hoy","mensajes","prospectos","citas","reels","redes"];
 function showTab(t){
   if(!TABS.includes(t)) t = "hoy";
   TABS.forEach(x => { $("#v-"+x).hidden = x !== t; });
@@ -521,7 +570,7 @@ function renderDay(){
     : `<div class="empty"><b>Sin citas este día</b>Agrega una con <b>+ Nueva cita</b> o pasando un prospecto a "Con cita".</div>`;
 }
 
-function renderAll(){ renderHoy(); renderKanban(); renderCal(); if(typeof renderInbox === "function" && loaded.i) renderInbox(); }
+function renderAll(){ renderHoy(); renderKanban(); renderCal(); renderReels(); if(typeof renderInbox === "function" && loaded.i) renderInbox(); }
 
 /* ---------- modal ---------- */
 function openModal(html){
@@ -787,6 +836,161 @@ document.addEventListener("click", async e => {
 });
 function startStats(){}
 
+/* ---------- reels ---------- */
+const REEL_STATUS = {idea:["Idea","var(--muted)"], grabar:["Por grabar","var(--warn)"], edicion:["En edición","var(--info)"], programado:["Programado","var(--gold)"], publicado:["Publicado","var(--ok)"]};
+const REEL_WHO = ["Fotos","Tania","En la casa"];
+const REEL_SERIES = [
+  ["El precio como gancho","La gente se queda para ver el precio, y el dato se revela al final."],
+  ["Recorridos que no aburren","Nada de caminar despacio por la casa: cortes rápidos y un solo foco."],
+  ["Créditos en 20 segundos","Una pregunta, una respuesta y una invitación a revisar su caso por WhatsApp."],
+  ["Propietarios que quieren vender","Para que los propietarios le escriban a Tania."],
+  ["Tania en acción","Generan confianza porque enseñan a la persona que va a atender al cliente."],
+  ["Zonas de Guadalajara","Temas locales, fáciles de compartir con familiares y conocidos de la zona."],
+  ["Otras ideas","Las que se van agregando."]
+];
+const r = (id, series, title, hook, how, who, date, time) => ({id, series:REEL_SERIES[series][0], title, hook, how, who, date:date||"", time:time||"", status:"idea", notes:""});
+const REEL_SEED = [
+  r("r01",0,"Adivina el precio","¿Cuánto crees que cuesta esta casa?","6 tomas rápidas, pausa de 2 segundos y aparece el precio en dorado.","Fotos","2026-11-06","10:00"),
+  r("r02",0,"¿Cuál cuesta más?","Una de estas casas cuesta más. ¿Cuál?","Dos casas lado a lado, sala contra sala y cocina contra cocina; al final, los precios.","Fotos","2026-11-18","12:00"),
+  r("r03",0,"Lo que alcanza","Esto te alcanza con [PRECIO] en [MUNICIPIO]","Recorrido rápido con recámaras, baños y metros en texto.","Fotos"),
+  r("r04",0,"Cuatro municipios","Cuatro casas, cuatro precios: ¿cuál eliges?","Tonalá, Tlaquepaque, Tlajomulco y Zapopan, 4 segundos cada una, con precio y recámaras.","Fotos","2026-11-08","10:00"),
+  r("r05",1,"Casa exprés","Conoce esta casa en 15 segundos","Un corte por espacio, al ritmo de la música, con el nombre de cada espacio.","Fotos","2026-11-11","12:00"),
+  r("r06",1,"De abajo hacia arriba","De la cochera al roof garden en 15 segundos","La casa de Zapopan subiendo nivel por nivel; termina en el asador.","Fotos"),
+  r("r07",1,"Del mapa a la fachada","Tu próxima casa podría estar aquí","Zoom del mapa de Jalisco al municipio y corte directo a la fachada, sin mostrar el punto exacto.","Fotos"),
+  r("r08",1,"Recorrido 3D","Recorre esta casa desde tu celular","Grabación de pantalla del modelo 3D en la página de Tania.","Fotos","2026-11-15","10:00"),
+  r("r09",1,"Un solo detalle","La carne asada del domingo, aquí","Se enseña solo lo mejor de la casa y al final su precio.","Fotos"),
+  r("r10",1,"Así está, así podría quedar","Misma casa, otra vida","Deslizador entre la foto real y el modelo renovado, con la leyenda \"Simulación\" visible.","Fotos"),
+  r("r11",2,"Cuánto te prestan","¿Sabes cuánto te presta Infonavit?","Tania explica dónde revisarlo y por qué conviene hacerlo antes de ver casas.","Tania","2026-11-13","10:00"),
+  r("r12",2,"Infonavit o banco","¿Infonavit o banco? Depende de esto","Tania da el criterio principal y aparecen los dos logos con efecto pop.","Tania"),
+  r("r13",2,"Fovissste","¿Trabajas para el Estado? Mira esto","Tania explica qué revisar primero para usar Fovissste.","Tania"),
+  r("r14",2,"Los papeles","Ten esto listo antes de buscar casa","Tania enumera con los dedos y aparece la lista en texto.","Tania"),
+  r("r15",2,"Comprar en pareja","¿Pueden comprar casa entre los dos?","Tania responde qué opciones existen y cuándo aplican.","Tania"),
+  r("r16",3,"Por qué no se vende","Por esto tu casa no se vende","Tania da 3 errores de su experiencia, uno por corte, con texto grande.","Tania","2026-11-09","10:00"),
+  r("r17",3,"Antes de anunciar","Antes de anunciar tu casa, revisa esto","Lista de 3 pendientes mientras Tania recorre una casa.","En la casa"),
+  r("r18",3,"Así la vendo","Así preparo una casa para venderla","Fotos, video, anuncios y visitas en 4 tomas de 4 segundos.","En la casa","2026-11-16","10:00"),
+  r("r19",3,"Misma casa, otra foto","Misma casa. ¿Cuál visitarías?","Foto oscura contra foto bien tomada, con permiso del dueño.","En la casa"),
+  r("r20",3,"¿Solo o con asesora?","¿Vender solo o con asesora?","Tania explica de frente qué hace ella y qué le tocaría hacer al dueño.","Tania"),
+  r("r21",4,"Un día de trabajo","Un día vendiendo casas en 20 segundos","Café, llaves, visita, papeles y firma en cortes de 2 segundos.","En la casa"),
+  r("r22",4,"Entrega de llaves","Hoy esta familia estrena casa","Momento real de la entrega, con permiso de los clientes y sin dirección visible.","En la casa"),
+  r("r23",4,"Lo que reviso","Lo primero que reviso en una casa","Tania señala 3 puntos reales durante una visita.","En la casa"),
+  r("r24",4,"La pregunta de siempre","Lo que más me preguntan en las visitas","Tania responde la pregunta real de la semana.","Tania"),
+  r("r25",5,"¿Cuál va contigo?","¿Zapopan, Tlajomulco o Tonalá?","Tania da un perfil de comprador por municipio, según lo que ve con sus clientes.","Tania"),
+  r("r26",5,"Antes de comprar ahí","Lo que debes saber antes de comprar en [MUNICIPIO]","Tania da 3 puntos de su experiencia en esa zona.","Tania")
+];
+let reelDocs = [], reelsBlocked = false;
+const reelsWritable = () => !!db && !reelsBlocked;
+// Las ideas base viven aquí; lo que se cambia o se agrega se guarda en Firestore (colección reels) con el mismo id.
+function allReels(){
+  const byId = new Map(REEL_SEED.map(x => [x.id, x]));
+  reelDocs.forEach(d => byId.set(d.id, {...(byId.get(d.id) || {}), ...d}));
+  return [...byId.values()].filter(x => !x.hidden);
+}
+const isSeedReel = id => REEL_SEED.some(x => x.id === id);
+const reelStatus = x => REEL_STATUS[x.status] ? x.status : "idea";
+const reelLate = x => x.date && x.date < todayStr() && reelStatus(x) !== "publicado";
+const reelStatusSelect = x => `<select class="reel-st" data-reel-status="${esc(x.id)}" aria-label="Estado de ${esc(x.title)}" ${reelsWritable() ? "" : "disabled"}>${Object.entries(REEL_STATUS).map(([k,v]) => `<option value="${k}"${k===reelStatus(x)?" selected":""}>${v[0]}</option>`).join("")}</select>`;
+const reelChip = x => `<span class="chip" style="--c:${REEL_STATUS[reelStatus(x)][1]}">${esc(REEL_STATUS[reelStatus(x)][0])}</span>`;
+
+function renderReels(){
+  const all = allReels(), t = todayStr();
+  const weekStart = addDays(t, -((new Date(t+"T12:00:00Z").getUTCDay() + 6) % 7));
+  const done = all.filter(x => reelStatus(x) === "publicado" && x.date >= weekStart && x.date <= addDays(weekStart,6)).length;
+  const late = all.filter(reelLate).length;
+  $("#reelSub").textContent = `${all.length} ideas · ${done} publicados esta semana`;
+  const nb = $("#nReels"); nb.hidden = !late; nb.textContent = late;
+  $("#reelBanner").hidden = !reelsBlocked;
+  $("#btnNewReel").disabled = !reelsWritable();
+
+  const next = all.filter(x => x.date && reelStatus(x) !== "publicado").sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time)).slice(0,8);
+  $("#reelCal").innerHTML = next.length ? next.map(x => `<div class="row">
+      <span class="when">${esc(niceDate(x.date,false))}<br><small style="color:var(--muted);font-weight:500">${esc(niceTime(x.time))}</small></span>
+      <div class="who"><b>${esc(x.title)}</b><small>${esc(x.who)}</small></div>
+      ${reelLate(x) ? `<span class="chip" style="--c:var(--bad)">Atrasado</span>` : ""}
+      <div class="acts">${reelStatusSelect(x)}<button class="btn sm ghost" type="button" data-reel-edit="${esc(x.id)}">Abrir</button></div></div>`).join("")
+    : `<div class="empty"><b>Sin fechas por publicar</b>Abre una idea y ponle fecha para que aparezca aquí.</div>`;
+
+  const q = $("#rq").value.trim().toLowerCase(), fs = $("#rSerie").value, fw = $("#rWho").value, fe = $("#rStatus").value;
+  const list = all.filter(x => (!fs || x.series === fs) && (!fw || x.who === fw) && (!fe || reelStatus(x) === fe) &&
+    (!q || [x.title, x.hook, x.how, x.notes].join(" ").toLowerCase().includes(q)));
+  const names = [...REEL_SERIES.map(s => s[0]), ...new Set(list.map(x => x.series).filter(n => !REEL_SERIES.some(s => s[0] === n)))];
+  $("#reelList").innerHTML = list.length ? names.map(n => {
+    const items = list.filter(x => x.series === n);
+    if(!items.length) return "";
+    const d = REEL_SERIES.find(s => s[0] === n)?.[1];
+    return `<div class="reel-series"><h3>${esc(n)}</h3>${d ? `<p>${esc(d)}</p>` : ""}<div class="reel-grid">${items.map(x => `<article class="reel">
+        <div class="t"><b>${esc(x.title)}</b><span class="chip">${esc(x.who)}</span></div>
+        <div class="hook">${esc(x.hook)}</div>
+        <div class="how">${esc(x.how)}</div>
+        ${x.date ? `<div class="note" style="${reelLate(x) ? "color:var(--bad)" : ""}">${esc(niceDate(x.date))}${x.time ? " · " + esc(niceTime(x.time)) : ""}</div>` : ""}
+        ${x.notes ? `<div class="note">${esc(x.notes)}</div>` : ""}
+        <div class="foot">${reelStatusSelect(x)}<button class="btn sm" type="button" data-reel-copy="${esc(x.id)}">Copiar</button><button class="btn sm ghost" type="button" data-reel-edit="${esc(x.id)}">Editar</button></div>
+      </article>`).join("")}</div></div>`;
+  }).join("") : `<div class="empty"><b>Nada con este filtro</b>Prueba con otra serie o estado.</div>`;
+}
+function reelWriteError(e){
+  if(e?.code === "permission-denied"){ reelsBlocked = true; renderReels(); toast("Falta publicar las reglas de Reels en Firebase"); }
+  else { renderReels(); toast("No se pudo guardar. Revisa tu conexión e intenta de nuevo."); }
+}
+async function saveReel(x){
+  const {id, ...data} = x; data.updatedAt = new Date().toISOString();
+  await db.collection("reels").doc(id).set(data);
+}
+function reelForm(x){
+  const isNew = !x;
+  x = x || {status:"idea", who:"Fotos", series:"Otras ideas", title:"", hook:"", how:"", date:"", time:"10:00", notes:""};
+  const seriesNames = [...new Set([...REEL_SERIES.map(s => s[0]), x.series])];
+  openModal(`<h3>${isNew ? "Nueva idea" : esc(x.title)}</h3>
+    <form id="rf" class="grid2" autocomplete="off">
+      <label class="f span2">Nombre de la idea<input id="r-title" required maxlength="80" value="${esc(x.title)}"></label>
+      <label class="f span2">Gancho en pantalla<input id="r-hook" required maxlength="120" value="${esc(x.hook)}"></label>
+      <label class="f span2">Cómo se ve<textarea id="r-how">${esc(x.how)}</textarea></label>
+      <label class="f">Serie<select id="r-series">${opt(seriesNames, x.series)}</select></label>
+      <label class="f">Cómo se hace<select id="r-who">${opt(REEL_WHO, x.who)}</select></label>
+      <label class="f">Fecha de publicación<input id="r-date" type="date" value="${esc(x.date)}"></label>
+      <label class="f">Hora<input id="r-time" type="time" step="900" value="${esc(x.time || "10:00")}"></label>
+      <label class="f span2">Estado<select id="r-status">${Object.entries(REEL_STATUS).map(([k,v]) => `<option value="${k}"${k===reelStatus(x)?" selected":""}>${v[0]}</option>`).join("")}</select></label>
+      <label class="f span2">Notas<textarea id="r-notes" placeholder="Qué casa se usa, qué falta confirmar con Tania, link del video">${esc(x.notes)}</textarea></label>
+      <div class="mrow span2">
+        ${!isNew ? `<span class="left" id="rdelWrap"><button class="btn sm ghost danger" type="button" id="rdel">Eliminar</button></span>` : ""}
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn primary" type="submit" ${reelsWritable() ? "" : "disabled"}>Guardar</button>
+      </div></form>`);
+  if(!isNew) $("#rdel").addEventListener("click", () => {
+    $("#rdelWrap").innerHTML = `<button class="btn sm danger" type="button" id="rdelYes">Sí, eliminar idea</button>`;
+    $("#rdelYes").addEventListener("click", async () => {
+      try{
+        if(isSeedReel(x.id)) await saveReel({...x, hidden:true}); else await db.collection("reels").doc(x.id).delete();
+        closeModal(); toast("Idea eliminada");
+      }catch(e){ closeModal(); reelWriteError(e); }
+    });
+  });
+  $("#rf").addEventListener("submit", async e => {
+    e.preventDefault(); if(!db) return;
+    const v = id => $(id).value.trim();
+    const data = {...x, title:v("#r-title"), hook:v("#r-hook"), how:v("#r-how"), series:v("#r-series"), who:v("#r-who"),
+      date:v("#r-date"), time:v("#r-date") ? (v("#r-time") || "10:00") : "", status:v("#r-status"), notes:v("#r-notes")};
+    if(isNew) data.id = db.collection("reels").doc().id;
+    try{ await saveReel(data); closeModal(); toast("Guardado"); }
+    catch(err){ closeModal(); reelWriteError(err); }
+  });
+}
+document.addEventListener("click", e => {
+  const ed = e.target.closest("[data-reel-edit]"), cp = e.target.closest("[data-reel-copy]");
+  if(ed){ const x = allReels().find(i => i.id === ed.dataset.reelEdit); if(x) reelForm(x); }
+  if(cp){ const x = allReels().find(i => i.id === cp.dataset.reelCopy); if(x) copy(`${x.hook}\n\n${x.how}`); }
+});
+document.addEventListener("change", async e => {
+  const id = e.target.dataset?.reelStatus; if(!id || !db) return;
+  const x = allReels().find(i => i.id === id); if(!x) return;
+  try{ await saveReel({...x, status:e.target.value}); toast("Estado actualizado"); }
+  catch(err){ reelWriteError(err); }
+});
+["#rq","#rSerie","#rWho","#rStatus"].forEach(id => $(id).addEventListener("input", renderReels));
+$("#rSerie").innerHTML += REEL_SERIES.map(s => `<option>${esc(s[0])}</option>`).join("");
+$("#rWho").innerHTML += REEL_WHO.map(c => `<option>${esc(c)}</option>`).join("");
+$("#rStatus").innerHTML += Object.entries(REEL_STATUS).map(([k,v]) => `<option value="${k}">${v[0]}</option>`).join("");
+$("#btnNewReel").addEventListener("click", () => reelForm(null));
+
 /* ---------- boot ---------- */
 $("#todayLbl").textContent = niceDate(todayStr()) === "hoy" ? (() => { const d = new Date(todayStr()+"T12:00:00Z"); return DIAS[d.getUTCDay()].replace(/^./,c=>c.toUpperCase()) + " " + d.getUTCDate() + " de " + MESES[d.getUTCMonth()]; })() : "";
 renderAll();
@@ -805,6 +1009,9 @@ onAuthStateChanged(auth, user => {
   unsubs.push(db.collection("prospects").onSnapshot(s => { prospects = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.p = true; renderAll(); }, onErr));
   unsubs.push(db.collection("appointments").onSnapshot(s => { appts = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.a = true; renderAll(); }, onErr));
   unsubs.push(db.collection("inbox").onSnapshot(s => { inbox = s.docs.map(d => ({id:d.id, ...d.data()})); loaded.i = true; renderInbox(); }, onErr));
+  // Reels aparte: si faltan sus reglas, el resto del panel sigue funcionando y las ideas se ven en modo lectura.
+  reelsBlocked = false;
+  unsubs.push(db.collection("reels").onSnapshot(s => { reelDocs = s.docs.map(d => ({id:d.id, ...d.data()})); reelsBlocked = false; renderReels(); }, e => { if(e?.code === "permission-denied") reelsBlocked = true; renderReels(); }));
 });
 $("#loginForm").addEventListener("submit", async e => {
   e.preventDefault(); const btn = $("#lg-btn"); btn.disabled = true; $("#lg-msg").textContent = "Entrando…";

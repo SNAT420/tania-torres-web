@@ -81,5 +81,47 @@
     "images": [
       "/img/propiedades/puerta-real-01.jpg"
     ]
+  },
+  {
+    "slug": "casa-tlajomulco-taupe",
+    "title": "Casa nueva en coto privado, Tlajomulco",
+    "type": "venta",
+    "price": 2387670,
+    "location": "Tlajomulco de Zúñiga, Jalisco",
+    "beds": 3,
+    "baths": 2.5,
+    "size": 91,
+    "parking": 1,
+    "description": "Casa nueva en coto privado en Tlajomulco. Precio desde $2,387,670.\n\n• 3 recámaras\n• 2½ baños\n• Cochera para 1 auto\n• Construcción: 91.20 m² · Terreno desde 82.50 m²\n• Incluye cocina y clósets\n\nAmenidades del coto: alberca, cancha, terraza, juegos infantiles, gym al aire libre, fogatero, dog park y acceso controlado.\n\nAcepta crédito Infonavit, Fovissste y bancario.\n\nFotos de casa muestra y áreas comunes.\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/tlajomulco-taupe-01.jpg",
+      "/img/propiedades/tlajomulco-taupe-02.jpg",
+      "/img/propiedades/tlajomulco-taupe-03.jpg",
+      "/img/propiedades/tlajomulco-taupe-04.jpg",
+      "/img/propiedades/tlajomulco-taupe-05.jpg",
+      "/img/propiedades/tlajomulco-taupe-06.jpg",
+      "/img/propiedades/tlajomulco-taupe-07.jpg",
+      "/img/propiedades/tlajomulco-taupe-08.jpg",
+      "/img/propiedades/tlajomulco-taupe-09.jpg",
+      "/img/propiedades/tlajomulco-taupe-10.jpg"
+    ]
+  },
+  {
+    "slug": "casa-tlajomulco-malva",
+    "title": "Casa nueva con 3 baños completos, Tlajomulco",
+    "type": "venta",
+    "price": 2999140,
+    "location": "Tlajomulco de Zúñiga, Jalisco",
+    "beds": 3,
+    "baths": 3,
+    "size": 0,
+    "parking": 2,
+    "description": "Casa nueva en Tlajomulco. Precio desde $2,999,140.\n\n• 3 recámaras, 1 en planta baja\n• 3 baños completos\n• Cochera para 2 autos\n• Terreno de 102 m²\n• Alberca y gimnasio en el coto\n\nAcepta crédito Infonavit, Cofinavit, Fovissste y bancario.\n\nFotos de referencia.\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/tlajomulco-malva-01.jpg",
+      "/img/propiedades/tlajomulco-malva-02.jpg",
+      "/img/propiedades/tlajomulco-malva-03.jpg",
+      "/img/propiedades/tlajomulco-malva-04.jpg"
+    ]
   }
 ]

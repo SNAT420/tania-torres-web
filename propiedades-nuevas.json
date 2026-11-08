@@ -123,5 +123,29 @@
       "/img/propiedades/tlajomulco-malva-03.jpg",
       "/img/propiedades/tlajomulco-malva-04.jpg"
     ]
+  },
+  {
+    "slug": "depa-zapopan-2rec",
+    "title": "Departamento de 2 recámaras, Zapopan",
+    "type": "venta",
+    "price": 5556632,
+    "location": "Zapopan, Jalisco",
+    "beds": 2,
+    "baths": 2,
+    "size": 90,
+    "parking": 0,
+    "description": "Departamento en venta en Zapopan. Precio desde $5,556,632.\n\n• 2 recámaras\n• 2 baños\n• 90.42 m²\n• Cocina integral con isla de granito\n• Vestidor\n• Entrega inmediata\n\nAmenidades: alberca con carriles de nado, gimnasio, sun deck, yoga deck, spa, pet zone y lobby.\n\nAcepta crédito bancario, Infonavit total, Cofinavit o contado.\n\nAgenda tu visita por WhatsApp: 33 2277 5288",
+    "images": [
+      "/img/propiedades/zapopan-depa-2rec-01.jpg",
+      "/img/propiedades/zapopan-depa-2rec-02.jpg",
+      "/img/propiedades/zapopan-depa-2rec-03.jpg",
+      "/img/propiedades/zapopan-depa-2rec-04.jpg",
+      "/img/propiedades/zapopan-depa-2rec-05.jpg",
+      "/img/propiedades/zapopan-depa-2rec-06.jpg",
+      "/img/propiedades/zapopan-depa-2rec-07.jpg",
+      "/img/propiedades/zapopan-depa-2rec-08.jpg",
+      "/img/propiedades/zapopan-depa-2rec-09.jpg",
+      "/img/propiedades/zapopan-depa-2rec-10.jpg"
+    ]
   }
 ]

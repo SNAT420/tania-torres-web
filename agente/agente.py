@@ -13,14 +13,14 @@ Uso:
        cada 10 min: si hay casa nueva en la página, avisa a quién le queda
 
 Variables opcionales:
-  OLLAMA_MODEL   modelo de Ollama (por defecto gpt-oss:20b)
+  OLLAMA_MODEL   modelo de Ollama (por defecto qwen3:8b)
   FIREBASE_KEY   ruta al JSON de la cuenta de servicio (por defecto ./cuenta-servicio.json)
 """
 import json, os, re, sys, time, unicodedata, urllib.request
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-MODELO = os.environ.get("OLLAMA_MODEL", "gpt-oss:20b")
+MODELO = os.environ.get("OLLAMA_MODEL", "qwen3:8b")
 OLLAMA = "http://localhost:11434/api/chat"
 PROYECTO = "tania-torres-web"
 WHATSAPP = "33 2277 5288"
@@ -154,6 +154,8 @@ def modelo(sistema, mensajes, con_casas=True):
         cuerpo["think"] = "low"   # piensa poco: responde más rápido
     else:
         cuerpo["format"] = "json"
+        if MODELO.startswith("qwen3"):
+            cuerpo["think"] = False   # sin modo "pensar": más rápido y gasta menos
     req = urllib.request.Request(OLLAMA, json.dumps(cuerpo).encode(), {"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=300) as r:
         texto = json.load(r)["message"]["content"]

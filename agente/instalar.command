@@ -70,6 +70,12 @@ def municipio(ubicacion):
     return "zona metropolitana de Guadalajara"
 
 
+try:  # el Python de python.org en Mac no trae certificados; certifi viene con firebase-admin
+    import certifi, ssl
+    _SSL = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    _SSL = None
+
 _cache = {"t": 0, "casas": []}
 
 
@@ -77,7 +83,7 @@ def casas():
     if time.time() - _cache["t"] < 600:
         return _cache["casas"]
     url = f"https://firestore.googleapis.com/v1/projects/{PROYECTO}/databases/(default)/documents/properties?pageSize=100"
-    with urllib.request.urlopen(url, timeout=20) as r:
+    with urllib.request.urlopen(url, timeout=20, context=_SSL) as r:
         docs = json.load(r).get("documents", [])
     lista = []
     for d in docs:
@@ -207,7 +213,7 @@ AGENTE_EOF
 echo "Instalando la conexión con Firebase..."
 python3 -m venv .venv
 .venv/bin/pip install -q --upgrade pip
-.venv/bin/pip install -q firebase-admin
+.venv/bin/pip install -q firebase-admin certifi
 
 cat > probar.command <<'EOF'
 #!/bin/bash

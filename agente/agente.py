@@ -6,7 +6,11 @@ No contesta solo a los clientes: escribe una respuesta sugerida en el panel
 
 Uso:
   python3 agente.py chat         -> pruebas: tú escribes como si fueras cliente
-  python3 agente.py borradores   -> revisa la bandeja del panel cada minuto y deja borradores
+  python3 agente.py revisar      -> hace una vuelta completa y termina (para probar)
+  python3 agente.py borradores   -> trabaja sin parar:
+       cada minuto: respuesta sugerida a mensajes nuevos de Instagram y Facebook
+       cada 30 min: mensaje de seguimiento para los prospectos que toca escribir hoy
+       cada 10 min: si hay casa nueva en la página, avisa a quién le queda
 
 Variables opcionales:
   OLLAMA_MODEL   modelo de Ollama (por defecto gpt-oss:20b)
@@ -75,6 +79,7 @@ def casas():
                 t = re.sub(re.escape(n), "", t, flags=re.I)
             return re.sub(r"\s+,", ",", re.sub(r"(en|,)\s*,", r"\1", re.sub(r"[ \t]{2,}", " ", t))).strip(" ,")
         lista.append({
+            "id": d["name"].rsplit("/", 1)[-1],
             "titulo": limpio(p.get("title", "")),
             "operacion": p.get("type", "venta"),
             "precio_desde": p.get("price"),
@@ -90,40 +95,61 @@ def casas():
 
 
 # ---------- el modelo ----------
-REGLAS = f"""Eres el asistente que redacta respuestas para Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolitana.
-Tu texto lo revisa una persona antes de mandarlo. Escribe como Tania en primera persona: español de México, cercano, profesional, breve (2 a 4 renglones), como un mensaje de WhatsApp.
+VOZ = """Redactas mensajes para Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolitana.
+Una persona revisa tu texto antes de mandarlo. Escribe como Tania en primera persona: español de México, cercano, profesional, breve (2 a 4 renglones), como un mensaje de WhatsApp.
 
 Cómo suena Tania:
 - Habla ella misma ("te comparto", "con gusto te la enseño", "déjame revisarlo"). Nunca "mi equipo", "nuestro equipo" ni "tu solicitud".
 - No uses "Por favor", ni "Estimado", ni listas numeradas. Si hay dos opciones, dilas en una frase.
 - Haz solo una pregunta al final, la más útil para avanzar.
 - Ejemplo: "Claro, tengo dos en Zapopan que aceptan Infonavit: un departamento de 2 recámaras desde $5,556,632 y una casa nueva de 3 recámaras desde $3,503,420. ¿Cuál te gustaría conocer?"
-- Si toca pasarlo a Tania, la respuesta igual va natural: "Eso lo vemos directo; dime qué casa te interesa y lo revisamos." No digas que lo vas a pasar a alguien.
+"""
 
+DATOS = f"""
 Reglas que no se rompen:
 - Usa SOLO los datos de la lista de casas de abajo. Si no está en la lista, no lo afirmes: di que lo confirmas.
 - Nunca inventes precios, medidas, créditos, disponibilidad ni fechas.
-- Ubicación: solo di el municipio. Nunca nombres de fraccionamientos, colonias ni calles, aunque aparezcan en la descripción. La ubicación exacta se comparte al confirmar la visita.
+- Ubicación: solo di el municipio. Nunca nombres de fraccionamientos, colonias ni calles. La ubicación exacta se comparte al confirmar la visita.
 - Los precios son "desde". No prometas montos de crédito ni aprobaciones.
 - Sin emojis. No ofrezcas "consultas gratis".
-- Si quiere visitar, pregunta qué casa, qué día y horario, y cómo piensa comprar (Infonavit, Fovissste, bancario o contado).
+- WhatsApp de Tania: {WHATSAPP}. Página: {PAGINA}.
+"""
+
+REGLAS = VOZ + """- Si toca pasarlo a Tania, la respuesta igual va natural: "Eso lo vemos directo; dime qué casa te interesa y lo revisamos." No digas que lo vas a pasar a alguien.
+""" + DATOS + """- Si quiere visitar, pregunta qué casa, qué día y horario, y cómo piensa comprar (Infonavit, Fovissste, bancario o contado).
 - Si pide descuento, negociar, apartar, hablar de papeles, escrituras o algo que no sepas: marca pasar_a_tania.
 - Si quiere vender o rentar su casa, pregunta colonia y número de recámaras, y marca pasar_a_tania.
-- WhatsApp de Tania: {WHATSAPP}. Página: {PAGINA}.
 
 Responde SOLO con este JSON:
-{{"respuesta": "texto para el cliente",
+{"respuesta": "texto para el cliente",
   "pasar_a_tania": true o false,
   "motivo": "por qué Tania debe tomarlo, o vacío",
   "interes": "Comprar" | "Vender" | "Rentar" | "Crédito" | "Otro",
-  "cita": null o {{"casa": "...", "fecha": "AAAA-MM-DD o vacío", "hora": "HH:MM o vacío"}}}}"""
+  "cita": null o {"casa": "...", "fecha": "AAAA-MM-DD o vacío", "hora": "HH:MM o vacío"}}"""
+
+SEGUIMIENTO = VOZ + DATOS + """
+Tarea: escribe UN mensaje de seguimiento para un prospecto que no ha vuelto a escribir.
+- Salúdalo por su primer nombre y retoma lo que buscaba (usa sus notas). No repitas un mensaje genérico.
+- Si en la lista hay una casa que le queda mejor por municipio, precio o crédito, menciónala con su precio "desde".
+- Propón un paso concreto y fácil: conocerla esta semana o mandarle fotos.
+- No lo presiones ni le reclames que no ha contestado.
+Responde SOLO con este JSON: {"mensaje": "texto"}"""
+
+COINCIDENCIA = VOZ + DATOS + """
+Tarea: llegó una casa nueva. Decide si le queda a este prospecto según lo que buscaba (municipio, presupuesto, recámaras, crédito, operación).
+Si no hay datos suficientes para pensar que le interesa, di que no. Es mejor no molestar a alguien que mandarle algo que no busca.
+Si sí le queda, escribe un mensaje corto avisándole de la casa con su precio "desde" y ofreciéndole fotos o una visita.
+Responde SOLO con este JSON: {"le_queda": true o false, "razon": "en pocas palabras", "mensaje": "texto o vacío"}"""
 
 
-def pedir(historial):
-    hoy = datetime.now(TZ).strftime("%A %d de %B de %Y, %H:%M")
-    sistema = REGLAS + f"\n\nHoy es {hoy}.\n\nCasas disponibles:\n" + json.dumps(casas(), ensure_ascii=False, indent=1)
+def modelo(sistema, mensajes, con_casas=True):
+    """Manda la conversación a Ollama y regresa el JSON que contesta."""
+    hoy = datetime.now(TZ).strftime("%d/%m/%Y %H:%M")
+    sistema += f"\n\nHoy es {hoy}."
+    if con_casas:
+        sistema += "\n\nCasas disponibles:\n" + json.dumps(casas(), ensure_ascii=False, indent=1)
     cuerpo = {"model": MODELO, "stream": False, "options": {"temperature": 0.3},
-              "messages": [{"role": "system", "content": sistema}] + historial}
+              "messages": [{"role": "system", "content": sistema}] + mensajes}
     if MODELO.startswith("gpt-oss"):
         cuerpo["think"] = "low"   # piensa poco: responde más rápido
     else:
@@ -132,9 +158,15 @@ def pedir(historial):
     with urllib.request.urlopen(req, timeout=300) as r:
         texto = json.load(r)["message"]["content"]
     try:
-        out = json.loads(texto[texto.index("{"):texto.rindex("}") + 1])
+        return json.loads(texto[texto.index("{"):texto.rindex("}") + 1])
     except ValueError:
-        out = {"respuesta": texto, "pasar_a_tania": True, "motivo": "El modelo no respondió en el formato esperado"}
+        return {"_crudo": texto}
+
+
+def pedir(historial):
+    out = modelo(REGLAS, historial)
+    if "_crudo" in out:
+        out = {"respuesta": out["_crudo"], "pasar_a_tania": True, "motivo": "El modelo no respondió en el formato esperado"}
     out.setdefault("respuesta", "")
     out.setdefault("pasar_a_tania", False)
     return out
@@ -159,37 +191,128 @@ def chat():
         historial.append({"role": "assistant", "content": r["respuesta"]})
 
 
-# ---------- modo bandeja del panel ----------
-def borradores():
+# ---------- trabajo con el panel (Firestore) ----------
+AQUI = os.path.dirname(os.path.abspath(__file__))
+
+
+def conectar():
     import firebase_admin
     from firebase_admin import credentials, firestore
-    llave = os.environ.get("FIREBASE_KEY", os.path.join(os.path.dirname(os.path.abspath(__file__)), "cuenta-servicio.json"))
-    firebase_admin.initialize_app(credentials.Certificate(llave))
-    db = firestore.client()
-    print(f"Revisando la bandeja cada minuto con {MODELO}. Ctrl+C para detener.")
+    llave = os.environ.get("FIREBASE_KEY", os.path.join(AQUI, "cuenta-servicio.json"))
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(credentials.Certificate(llave))
+    return firestore.client()
+
+
+def log(txt):
+    print(f"[{datetime.now(TZ):%d/%m %H:%M}] {txt}", flush=True)
+
+
+def hoy():
+    return datetime.now(TZ).strftime("%Y-%m-%d")
+
+
+def dias_desde(fecha):
+    try:
+        return (datetime.now(TZ).date() - datetime.strptime(fecha[:10], "%Y-%m-%d").date()).days
+    except (TypeError, ValueError):
+        return 0
+
+
+def ficha(p):
+    """Lo que el modelo necesita saber de un prospecto."""
+    return json.dumps({k: p.get(k) for k in ("name", "interest", "property", "channel", "stage", "notes", "lastContact")},
+                      ensure_ascii=False)
+
+
+def tarea_bandeja(db):
+    """Mensajes nuevos de Instagram y Facebook -> respuesta sugerida."""
+    for doc in db.collection("inbox").where("status", "==", "nuevo").stream():
+        m = doc.to_dict()
+        if not m.get("messages") or m.get("draftFor") == m.get("lastAt"):
+            continue  # ya tiene borrador para el último mensaje
+        historial = [{"role": "user", "content": x["text"]} for x in m["messages"][-10:] if x.get("text")]
+        r = pedir(historial)
+        doc.reference.update({
+            "draft": r["respuesta"], "draftHandoff": bool(r.get("pasar_a_tania")), "draftReason": r.get("motivo", ""),
+            "draftInterest": r.get("interes", ""), "draftAppt": r.get("cita"),
+            "draftFor": m.get("lastAt"), "draftAt": datetime.now(TZ).isoformat(),
+        })
+        log(f"Respuesta sugerida para {m.get('name') or m.get('username') or doc.id}")
+
+
+def tarea_seguimientos(db):
+    """Prospectos a los que toca escribir hoy -> mensaje personalizado (lo usa el botón WhatsApp de la pestaña Hoy)."""
+    t = hoy()
+    for doc in db.collection("prospects").stream():
+        p = doc.to_dict()
+        if p.get("stage") == "cita":
+            continue
+        if p.get("nextFollowUp") and p["nextFollowUp"] <= t:
+            clave = p["nextFollowUp"]
+        elif p.get("stage") == "sinrespuesta" and not p.get("nextFollowUp") and dias_desde(p.get("lastContact")) >= 2:
+            clave = p.get("lastContact")
+        else:
+            continue
+        if p.get("aiFollowFor") == clave:
+            continue
+        r = modelo(SEGUIMIENTO, [{"role": "user", "content": f"Prospecto: {ficha(p)}\nDías sin contacto: {dias_desde(p.get('lastContact'))}"}])
+        if r.get("mensaje"):
+            doc.reference.update({"aiFollow": r["mensaje"], "aiFollowFor": clave, "aiFollowAt": datetime.now(TZ).isoformat()})
+            log(f"Seguimiento listo para {p.get('name')}")
+
+
+def tarea_casas_nuevas(db):
+    """Casa nueva en la página -> avisa a los prospectos a los que les queda."""
+    archivo = os.path.join(AQUI, "casas-vistas.json")
+    actuales = {c["id"]: c for c in casas()}
+    if not os.path.exists(archivo):  # primera vez: solo aprende cuáles ya existen
+        json.dump(list(actuales), open(archivo, "w"))
+        return
+    vistas = set(json.load(open(archivo)))
+    nuevas = [c for i, c in actuales.items() if i not in vistas]
+    if not nuevas:
+        return
+    prospectos = [d for d in db.collection("prospects").stream()
+                  if d.to_dict().get("interest") not in ("Vender", "Rentar")]
+    for casa in nuevas:
+        log(f"Casa nueva: {casa['titulo']}. Revisando {len(prospectos)} prospectos...")
+        for doc in prospectos:
+            p = doc.to_dict()
+            r = modelo(COINCIDENCIA, [{"role": "user", "content": f"Casa nueva: {json.dumps(casa, ensure_ascii=False)}\nProspecto: {ficha(p)}"}],
+                       con_casas=False)
+            if r.get("le_queda") and r.get("mensaje"):
+                doc.reference.update({"aiMatch": {"casa": casa["titulo"], "razon": r.get("razon", ""), "mensaje": r["mensaje"],
+                                                  "at": datetime.now(TZ).isoformat()}})
+                log(f"  Le queda a {p.get('name')}: {r.get('razon', '')}")
+        vistas.add(casa["id"])
+        json.dump(sorted(vistas), open(archivo, "w"))
+
+
+def trabajar(una_vez=False):
+    db = conectar()
+    log(f"Agente de Tania trabajando con {MODELO}.")
+    ultimo = {"seg": 0, "casas": 0}
     while True:
-        try:
-            for doc in db.collection("inbox").where("status", "==", "nuevo").stream():
-                m = doc.to_dict()
-                if not m.get("messages") or m.get("draftFor") == m.get("lastAt"):
-                    continue  # ya tiene borrador para el último mensaje
-                historial = [{"role": "user", "content": x["text"]} for x in m["messages"][-10:] if x.get("text")]
-                r = pedir(historial)
-                doc.reference.update({
-                    "draft": r["respuesta"],
-                    "draftHandoff": bool(r.get("pasar_a_tania")),
-                    "draftReason": r.get("motivo", ""),
-                    "draftInterest": r.get("interes", ""),
-                    "draftAppt": r.get("cita"),
-                    "draftFor": m.get("lastAt"),
-                    "draftAt": datetime.now(TZ).isoformat(),
-                })
-                print(f"[{datetime.now(TZ):%H:%M}] Borrador para {m.get('name') or m.get('username') or doc.id}")
-        except Exception as e:
-            print("Error:", e)
+        for nombre, tarea, cada in (("bandeja", tarea_bandeja, 0), ("seg", tarea_seguimientos, 1800), ("casas", tarea_casas_nuevas, 600)):
+            if cada and time.time() - ultimo.get(nombre, 0) < cada and not una_vez:
+                continue
+            try:
+                tarea(db)
+                ultimo[nombre] = time.time()
+            except Exception as e:
+                log(f"Error en {nombre}: {e}")
+        if una_vez:
+            log("Revisión terminada.")
+            return
         time.sleep(60)
 
 
 if __name__ == "__main__":
     modo = sys.argv[1] if len(sys.argv) > 1 else "chat"
-    {"chat": chat, "borradores": borradores}.get(modo, chat)()
+    if modo in ("borradores", "trabajar"):
+        trabajar()
+    elif modo == "revisar":
+        trabajar(una_vez=True)
+    else:
+        chat()

@@ -428,9 +428,9 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
       for (let i = 0; i < 4; i++) { const p = planta(.75); p.children[0].visible = false; p.position.set(jx - .43 + i * .28, .2, Z0 - .35); dest.add(p); }
     }
   }
-  if (cfg.auto && !esDepto) {
-    const modos = cfg.auto.modos || ['actual', 'renovado'];
-    for (const modo of modos) { const a = auto(); a.position.set(cfg.auto.x, 0, cfg.auto.z); a.rotation.y = (cfg.auto.rot || 0) * Math.PI / 180; grupoModo(modo).add(a); }
+  if (!esDepto) for (const au of cfg.autos || (cfg.auto ? [cfg.auto] : [])) {   // "autos": varios lugares de cochera
+    const modos = au.modos || ['actual', 'renovado'];
+    for (const modo of modos) { const a = auto(); a.position.set(au.x, 0, au.z); a.rotation.y = (au.rot || 0) * Math.PI / 180; grupoModo(modo).add(a); }
   }
   // ── Reja al frente
   if (!esDepto) for (const modo of ['actual', 'renovado']) {
@@ -693,6 +693,13 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
         en(g, caja(L - .04, 2.16, .012, M.vidrio, false), q.puerta.de + L / 2, y + 1.1, q.z + .06);
         for (const [w, hh, x, yy] of [[L, .05, 0, 2.18], [.05, 2.2, -L / 2, 1.1], [.05, 2.2, L / 2, 1.1], [.035, 2.2, 0, 1.1]]) en(g, caja(w, hh, .07, metalA), q.puerta.de + L / 2 + x, y + yy, q.z + .06);
       }
+      if (q.tinaco) {                                // tinaco sobre el cuarto de azotea
+        const tin = new THREE.Group(), tx = q.tinaco.x ?? q.x + q.w - .7, tz = q.tinaco.z ?? q.z + q.d - .7;
+        en(tin, cil(.52, .55, 1.15, std('#1f1f22', { roughness: .5 }), 32), 0, .62, 0); en(tin, cil(.3, .52, .16, std('#1f1f22', { roughness: .5 }), 32), 0, 1.27, 0);
+        en(tin, caja(1.2, .1, 1.2, std('#9b968e')), 0, .05, 0);
+        tin.position.set(tx, y + h + .12, tz); g.add(tin);
+      }
+      if (q.nombre) etiquetas.push({ nivel: 'azotea', texto: q.nombre, medidas: `${q.w.toFixed(1)} × ${q.d.toFixed(1)} m`, pos: new THREE.Vector3(W - (q.x + q.w / 2), y + h + .5, q.z + q.d / 2) });
       techo.add(g);
     }
     if (roofGarden && az.pergola) {
@@ -772,7 +779,7 @@ export function crearVisor(contenedor, cfg, { onListo, calidad = 'auto' } = {}) 
     // corte de sección: en las plantas los muros se cortan a 1.55 m para ver adentro
     if (nivel < 0) renderer.clippingPlanes = [];
     else { corte.constant = nivel * NIV + 1.55; renderer.clippingPlanes = [corte]; }
-    for (const e of etiquetas) e.activa = e.nivel === nivel;
+    for (const e of etiquetas) e.activa = vista === 'azotea' ? e.nivel === 'azotea' : e.nivel === nivel;
   }
   function irA(v, dur = 1.2) { camAnim = { from: camera.position.clone(), fromT: controls.target.clone(), to: posDe(v), toT: vistas[v].target.clone(), t: 0, dur }; }
 

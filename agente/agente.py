@@ -181,27 +181,43 @@ Responde SOLO con este JSON: {"le_queda": true o false, "razon": "en pocas palab
 VOZ, REGLAS, SEGUIMIENTO, COINCIDENCIA = (x.replace("{pagina}", PAGINA) for x in (VOZ, REGLAS, SEGUIMIENTO, COINCIDENCIA))
 
 
-def modelo(sistema, mensajes, con_casas=True):
-    """Manda la conversación a Ollama y regresa el JSON que contesta."""
+TIPOS = ["vago", "casa", "busqueda", "dinero", "credito", "visita", "contacto", "vender", "renta", "fuera",
+         "desconfianza", "cierre", "multimedia", "tania", "spam"]
+ESQ_RESPUESTA = {"type": "object", "required": ["tipo", "respuesta", "pasar_a_tania", "motivo", "interes"], "properties": {
+    "tipo": {"type": "string", "enum": TIPOS},
+    "respuesta": {"type": "string"},
+    "pasar_a_tania": {"type": "boolean"},
+    "motivo": {"type": "string"},
+    "interes": {"type": "string", "enum": ["Comprar", "Vender", "Rentar", "Crédito", "Otro"]}}}
+ESQ_MENSAJE = {"type": "object", "required": ["mensaje"], "properties": {"mensaje": {"type": "string"}}}
+ESQ_COINCIDENCIA = {"type": "object", "required": ["le_queda", "razon", "mensaje"], "properties": {
+    "le_queda": {"type": "boolean"}, "razon": {"type": "string"}, "mensaje": {"type": "string"}}}
+
+
+def modelo(sistema, mensajes, con_casas=True, esquema=None):
+    """Manda la conversación a Ollama y regresa el JSON que contesta.
+    Con esquema, Ollama obliga al modelo a contestar exactamente con esos campos."""
     hoy = datetime.now(TZ).strftime("%d/%m/%Y %H:%M")
     sistema += f"\n\nHoy es {hoy}."
     if con_casas:
         sistema += "\n\nCasas disponibles:\n" + json.dumps(casas(), ensure_ascii=False, indent=1)
     cuerpo = {"model": MODELO, "stream": False, "options": {"temperature": 0.3},
               "messages": [{"role": "system", "content": sistema}] + mensajes}
+    cuerpo["format"] = esquema or "json"
     if MODELO.startswith("gpt-oss"):
         cuerpo["think"] = "low"   # piensa poco: responde más rápido
-    else:
-        cuerpo["format"] = "json"
-        if MODELO.startswith("qwen3"):
-            cuerpo["think"] = False   # sin modo "pensar": más rápido y gasta menos
+    elif MODELO.startswith("qwen3"):
+        cuerpo["think"] = False   # sin modo "pensar": más rápido y gasta menos
     req = urllib.request.Request(OLLAMA, json.dumps(cuerpo).encode(), {"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=300) as r:
         texto = json.load(r)["message"]["content"]
     try:
-        return json.loads(texto[texto.index("{"):texto.rindex("}") + 1])
+        out = json.loads(texto[texto.index("{"):texto.rindex("}") + 1])
     except ValueError:
         return {"_crudo": texto}
+    if esquema and not all(k in out for k in esquema["required"]):
+        out["_crudo"] = texto  # contestó con otra forma: se guarda para revisarlo
+    return out
 
 
 def saludo():
@@ -250,9 +266,10 @@ def pedir(historial, primero=False):
     historial = [{"role": h["role"], "content": preparar(h["content"]) if h["role"] == "user" else h["content"]} for h in historial]
     contexto = (f"\n\nEs el PRIMER mensaje de esta persona. Saludo que corresponde ahora: \"{saludo()}\"." if primero
                 else "\n\nNo es el primer mensaje de esta persona: no la saludes de nuevo.")
-    out = modelo(REGLAS + contexto, historial)
-    if "_crudo" in out:
-        out = {"respuesta": out["_crudo"], "pasar_a_tania": True, "motivo": "El modelo no respondió en el formato esperado"}
+    out = modelo(REGLAS + contexto, historial, esquema=ESQ_RESPUESTA)
+    if "_crudo" in out and not out.get("respuesta"):
+        out = {"respuesta": "", "tipo": None, "pasar_a_tania": True,
+               "motivo": "El modelo no respondió en el formato esperado: " + out["_crudo"][:300]}
     out.setdefault("respuesta", "")
     out.setdefault("pasar_a_tania", False)
     return revisar(out)
@@ -342,7 +359,8 @@ def tarea_seguimientos(db):
             continue
         if p.get("aiFollowFor") == clave:
             continue
-        r = modelo(SEGUIMIENTO, [{"role": "user", "content": f"Prospecto: {ficha(p)}\nDías sin contacto: {dias_desde(p.get('lastContact'))}"}])
+        r = modelo(SEGUIMIENTO, [{"role": "user", "content": f"Prospecto: {ficha(p)}\nDías sin contacto: {dias_desde(p.get('lastContact'))}"}],
+                   esquema=ESQ_MENSAJE)
         if r.get("mensaje"):
             r["mensaje"] = revisar({"respuesta": r["mensaje"]})["respuesta"]
             doc.reference.update({"aiFollow": r["mensaje"], "aiFollowFor": clave, "aiFollowAt": datetime.now(TZ).isoformat()})
@@ -367,7 +385,7 @@ def tarea_casas_nuevas(db):
         for doc in prospectos:
             p = doc.to_dict()
             r = modelo(COINCIDENCIA, [{"role": "user", "content": f"Casa nueva: {json.dumps(casa, ensure_ascii=False)}\nProspecto: {ficha(p)}"}],
-                       con_casas=False)
+                       con_casas=False, esquema=ESQ_COINCIDENCIA)
             if r.get("le_queda") and r.get("mensaje"):
                 r["mensaje"] = revisar({"respuesta": r["mensaje"]})["respuesta"]
                 doc.reference.update({"aiMatch": {"casa": casa["titulo"], "razon": r.get("razon", ""), "mensaje": r["mensaje"],
@@ -402,5 +420,9 @@ if __name__ == "__main__":
         trabajar()
     elif modo == "revisar":
         trabajar(una_vez=True)
+    elif modo == "diagnostico":  # muestra lo que contesta el modelo, sin procesar
+        msg = " ".join(sys.argv[2:]) or "info"
+        print(f"Modelo {MODELO} · mensaje: {msg}\n")
+        print(json.dumps(modelo(REGLAS, [{"role": "user", "content": msg}], esquema=ESQ_RESPUESTA), ensure_ascii=False, indent=1))
     else:
         chat()

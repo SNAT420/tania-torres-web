@@ -768,7 +768,9 @@ function renderInbox(){
     return `<div class="row${(m.status||"nuevo")==="nuevo" ? " unread" : ""}" style="align-items:flex-start">
       <div class="who"><b>${esc(m.name || m.username || "Sin nombre")}</b>
         <small>${esc([m.channel, m.username ? "@" + m.username : "", ago(m.lastAt)].filter(Boolean).join(" · "))}</small>
-        <div class="msg-thread">${msgs.map(x => `<div class="bubble">${esc(x.text)}<small>${esc(ago(x.at))}</small></div>`).join("")}</div></div>
+        <div class="msg-thread">${msgs.map(x => `<div class="bubble">${esc(x.text)}<small>${esc(ago(x.at))}</small></div>`).join("")}</div>
+        ${m.draft && m.draftFor === m.lastAt ? `<div class="bubble" style="border:1px dashed var(--gold,#c9a96e);margin-top:.5rem"><small style="display:block;margin-bottom:.3rem">Respuesta sugerida por el agente${m.draftHandoff ? " · Pasar a Tania" + (m.draftReason ? ": " + esc(m.draftReason) : "") : ""}</small>${esc(m.draft)}
+          <div style="margin-top:.4rem"><button class="btn sm" type="button" data-copy-draft="${esc(m.id)}">Copiar respuesta</button></div></div>` : ""}</div>
       <div class="acts">
         ${p ? `<span class="chip" style="--c:var(--st-${esc(p.stage)})">${esc(STAGE[p.stage]?.label || "")}</span><button class="btn sm ghost" type="button" data-edit="${esc(p.id)}">Abrir</button>`
             : `<button class="btn sm primary" type="button" data-reg="${esc(m.id)}" ${canWrite ? "" : "disabled"}>Registrar</button>`}
@@ -778,7 +780,8 @@ function renderInbox(){
 }
 $("#fInbox").addEventListener("change", renderInbox);
 document.addEventListener("click", async e => {
-  const r = e.target.closest("[data-reg]"), a = e.target.closest("[data-arch]");
+  const r = e.target.closest("[data-reg]"), a = e.target.closest("[data-arch]"), cd = e.target.closest("[data-copy-draft]");
+  if(cd){ const m = inbox.find(x => x.id === cd.dataset.copyDraft); if(m?.draft) copy(m.draft); }
   if(r){ const m = inbox.find(x => x.id === r.dataset.reg); if(!m) return;
     const convo = (m.messages || []).map(x => "- " + x.text).join("\n");
     prospectForm(null, {inboxId:m.id, name:m.name || m.username || "", channel:CANALES.includes(m.channel) ? m.channel : "Otro",

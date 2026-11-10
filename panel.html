@@ -178,6 +178,7 @@ img{max-width:100%}
 .bubble{background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px;overflow-wrap:anywhere}
 .bubble small{display:block;color:var(--muted);font-size:11px}
 .row.unread .who b::after{content:"Nuevo";margin-left:8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.ai-msg{display:block;margin-top:.35rem;padding:.45rem .6rem;border-left:2px solid var(--gold,#c9a96e);color:inherit;opacity:.85;white-space:pre-wrap;font-size:.82rem;line-height:1.4}
 </style>
 </head>
 <body>
@@ -374,7 +375,8 @@ function showCopyFallback(text){
   const ta = $("#cpTxt"); ta.focus(); ta.select();
 }
 const firstName = n => String(n||"").trim().split(/\s+/)[0] || "";
-const msgSeguimiento = p => `Hola, ${firstName(p.name)}. Te escribo para saber si te sigue interesando ${p.property ? "la casa en " + p.property : "la casa que viste"}. Si quieres, te comparto horarios para que la conozcas esta semana.`;
+const aiFollowOk = p => p.aiFollow && (p.aiFollowFor === p.nextFollowUp || (!p.nextFollowUp && p.aiFollowFor === p.lastContact));
+const msgSeguimiento = p => aiFollowOk(p) ? p.aiFollow : `Hola, ${firstName(p.name)}. Te escribo para saber si te sigue interesando ${p.property ? "la casa en " + p.property : "la casa que viste"}. Si quieres, te comparto horarios para que la conozcas esta semana.`;
 const msgCita = a => `Listo, tu visita queda agendada para el ${niceDate(a.date)} a las ${niceTime(a.time)}${a.property ? " en " + a.property : ""}. Te mando la ubicación exacta un día antes. Si se te presenta algo, avísame por aquí para moverla sin problema.`;
 function gcalLink(a){
   const start = a.date.replace(/-/g,"") + "T" + a.time.replace(":","") + "00";
@@ -412,6 +414,9 @@ function dueItems(){
       out.push({kind:"seg", p, sort:"1"+p.lastContact, reason:`Sin respuesta desde ${niceDate(p.lastContact,false)}`, c:"var(--st-sinrespuesta)"});
     }
   }
+  for(const p of prospects){
+    if(p.aiMatch && p.aiMatch.mensaje) out.push({kind:"match", p, sort:"0"+(p.aiMatch.at||""), reason:"Casa nueva: " + p.aiMatch.casa, c:"var(--gold, #c9a96e)"});
+  }
   for(const a of appts){
     if(a.status === "programada" && (a.date === t || a.date === tm)){
       out.push({kind:"cita", a, sort:"2"+a.date+a.time, reason:`Cita ${niceDate(a.date)} ${niceTime(a.time)}`, c:"var(--st-cita)"});
@@ -437,7 +442,14 @@ function renderHoy(){
         <a class="btn sm" target="_blank" rel="noopener" href="${esc(gcalLink(a))}">Google Calendar</a></div></div>`;
     }
     const p = it.p;
-    return `<div class="row"><div class="who"><b>${esc(p.name)}</b><small>${esc([p.interest, p.property, p.channel].filter(Boolean).join(" · "))}</small></div>
+    if(it.kind === "match"){ const m = p.aiMatch;
+      return `<div class="row"><div class="who"><b>${esc(p.name)}</b><small>${esc(m.razon || "")}</small><small class="ai-msg">${esc(m.mensaje)}</small></div>
+        <span class="chip" style="--c:${it.c}">${esc(it.reason)}</span>
+        <div class="acts">${p.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(p.phone, m.mensaje))}">WhatsApp</a>` : `<button class="btn sm" type="button" data-copy-match="${esc(p.id)}">Copiar mensaje</button>`}
+        <button class="btn sm" type="button" data-match-done="${esc(p.id)}" ${canWrite ? "" : "disabled"}>Listo</button>
+        <button class="btn sm ghost" type="button" data-edit="${esc(p.id)}">Abrir</button></div></div>`;
+    }
+    return `<div class="row"><div class="who"><b>${esc(p.name)}</b><small>${esc([p.interest, p.property, p.channel].filter(Boolean).join(" · "))}</small>${aiFollowOk(p) ? `<small class="ai-msg">${esc(p.aiFollow)}</small>` : ""}</div>
       <span class="chip" style="--c:${it.c}">${esc(it.reason)}</span>
       <div class="acts">${p.phone ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(p.phone, msgSeguimiento(p)))}">WhatsApp</a>` : `<button class="btn sm" type="button" data-copy-seg="${esc(p.id)}">Copiar mensaje</button>`}
       <button class="btn sm" type="button" data-done="${esc(p.id)}" ${canWrite ? "" : "disabled"}>Contactado</button>
@@ -718,7 +730,12 @@ function handleWriteError(e){
 }
 
 /* ---------- events ---------- */
-document.addEventListener("click", e => {
+document.addEventListener("click", async e => {
+  const mk = e.target.closest("[data-copy-match],[data-match-done]");
+  if(mk){ const p = prospects.find(x => x.id === (mk.dataset.copyMatch || mk.dataset.matchDone)); if(!p) return;
+    if(mk.dataset.copyMatch) copy(p.aiMatch?.mensaje || "");
+    else { try{ await db.collection("prospects").doc(p.id).update({aiMatch:null, lastContact:todayStr(), updatedAt:new Date().toISOString()}); toast("Listo"); }catch(err){ handleWriteError(err); } }
+    return; }
   const el = e.target.closest("[data-edit],[data-done],[data-stage],[data-day],[data-edit-appt],[data-copy-seg],[data-copy-cita]");
   if(!el) return;
   if(el.dataset.edit){ const p = prospects.find(x => x.id === el.dataset.edit); if(p) prospectForm(p); }

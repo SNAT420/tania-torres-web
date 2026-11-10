@@ -58,7 +58,11 @@ try:  # el Python de python.org en Mac no trae certificados; certifi viene con f
 except ImportError:
     _SSL = None
 
-_cache = {"t": 0, "casas": []}
+_cache = {"t": 0, "casas": [], "ocultar": {}, "precios": set()}
+
+
+def es_vendida(p):
+    return p.get("status") == "vendida" or bool(re.match(r"\s*vendid[ao]", p.get("description") or "", re.I))
 
 
 def casas():
@@ -67,17 +71,24 @@ def casas():
     url = f"https://firestore.googleapis.com/v1/projects/{PROYECTO}/databases/(default)/documents/properties?pageSize=100"
     with urllib.request.urlopen(url, timeout=20, context=_SSL) as r:
         docs = json.load(r).get("documents", [])
-    lista = []
+    lista, todos_ocultar, precios = [], {}, set()
     for d in docs:
         p = {k: _valor(v) for k, v in d.get("fields", {}).items()}
         # quita los nombres de fraccionamiento antes de que el modelo los vea
         mun = municipio(p.get("location", ""))
         ocultar = [x.strip() for x in (p.get("location") or "").split(",")
-                   if x.strip() and _sin_acentos(mun) not in _sin_acentos(x) and "jalisco" not in _sin_acentos(x)]
+                   if len(x.strip()) > 3 and _sin_acentos(mun) not in _sin_acentos(x) and "jalisco" not in _sin_acentos(x)]
+        todos_ocultar.update({n: mun for n in ocultar})
+        if es_vendida(p):
+            continue  # no ofrecer casas vendidas
+
         def limpio(t):
             for n in ocultar:
                 t = re.sub(re.escape(n), "", t, flags=re.I)
-            return re.sub(r"\s+,", ",", re.sub(r"(en|,)\s*,", r"\1", re.sub(r"[ \t]{2,}", " ", t))).strip(" ,")
+            t = re.sub(r"(?im)^.*agenda tu visita.*$", "", t)
+            return re.sub(r"\s+,", ",", re.sub(r"(en|,)\s*,", r"\1", re.sub(r"[ \t]{2,}", " ", t))).strip(" ,\n")
+        if p.get("price"):
+            precios.add(int(p["price"]))
         lista.append({
             "id": d["name"].rsplit("/", 1)[-1],
             "titulo": limpio(p.get("title", "")),
@@ -88,59 +99,66 @@ def casas():
             "banos": p.get("baths") or None,
             "m2_construccion": p.get("size") or None,
             "estacionamientos": p.get("parking") or None,
-            "descripcion": limpio(p.get("description") or "")[:500],
+            "descripcion": limpio(p.get("description") or "")[:600],
         })
-    _cache.update(t=time.time(), casas=lista)
+    _cache.update(t=time.time(), casas=lista, ocultar=todos_ocultar, precios=precios)
     return lista
 
 
 # ---------- el modelo ----------
-VOZ = """Redactas mensajes para Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolitana.
-Una persona revisa tu texto antes de mandarlo. Escribe como Tania en primera persona: español de México, cercano, profesional, breve (2 a 4 renglones), como un mensaje de WhatsApp.
+VOZ = """Redactas mensajes para Tania Torres, asesora inmobiliaria en Guadalajara y zona metropolitana (Guadalajara, Zapopan, Tlajomulco, Tlaquepaque y Tonalá).
+Una persona revisa tu texto antes de mandarlo. Escribe como Tania en primera persona: español de México, cercano, profesional, breve (2 a 4 renglones), como un mensaje de Messenger o WhatsApp.
 
 Cómo suena Tania:
-- Habla ella misma ("te comparto", "con gusto te la enseño", "déjame revisarlo"). Nunca "mi equipo", "nuestro equipo" ni "tu solicitud".
-- No uses "Por favor", ni "Estimado", ni listas numeradas. Si hay dos opciones, dilas en una frase.
-- Haz solo una pregunta al final, la más útil para avanzar.
-- No empujes la cita. Primero informa y deja que la persona vea las casas; la visita se ofrece solo si la pide o si ya mostró interés claro en una casa.
-- Comparte la página de Tania cuando ayude a ver fotos, precios y todas las casas (por ejemplo al dar información de una casa o cuando busca algo). Ponla tal cual: {pagina}
-- Ejemplo: "Claro, tengo dos en Zapopan que aceptan Infonavit: un departamento de 2 recámaras desde $5,556,632 y una casa nueva de 3 recámaras desde $3,503,420. Aquí puedes ver fotos de las dos: {pagina} ¿Cuál te llama más la atención?"
+- Habla ella misma ("te comparto", "con gusto", "déjame revisarlo"). Nunca "mi equipo", "nuestro equipo", "tu solicitud", "estimado cliente".
+- No uses "Por favor" ni listas numeradas. Si hay dos opciones, dilas en una frase.
+- Tutea a la persona, salvo que ella hable de usted; entonces háblale de usted.
+- Termina con UNA sola pregunta, la más útil para avanzar. Si la persona se está despidiendo, no preguntes nada.
+- No empujes la cita. Primero informa y deja que vea las casas; la visita se ofrece solo si la pide o si ya mostró interés claro en una casa.
+- Comparte la página cuando ayude a ver fotos, precios y todas las casas. Ponla tal cual: {pagina}
+- Sin emojis. Nunca ofrezcas "consultas gratis" ni digas "gratis".
 """
-
-VOZ = VOZ.replace("{pagina}", PAGINA)
 
 DATOS = f"""
 Reglas que no se rompen:
-- Usa SOLO los datos de la lista de casas de abajo. Si no está en la lista, no lo afirmes: di que lo confirmas.
-- Nunca inventes precios, medidas, créditos, disponibilidad ni fechas.
-- Ubicación: solo di el municipio. Nunca nombres de fraccionamientos, colonias ni calles. La ubicación exacta se comparte al confirmar la visita.
-- Los precios son "desde". No prometas montos de crédito ni aprobaciones.
-- Sin emojis. No ofrezcas "consultas gratis".
-- WhatsApp de Tania: {WHATSAPP}. Página: {PAGINA}.
+- Usa SOLO los datos de la lista de casas de abajo. Lo que no está en la lista no lo afirmes: di que lo confirmas.
+- Nunca inventes precios, medidas, créditos, disponibilidad, fechas, enganches ni mensualidades.
+- Ubicación: solo el municipio. Nunca nombres de fraccionamientos, colonias ni calles. La ubicación exacta la comparte Tania directamente.
+- Los precios son "desde". No prometas montos de crédito, aprobaciones ni que "sí te alcanza".
+- Las casas de la lista están publicadas y disponibles; puedes decir que sí está disponible si identificas cuál es.
+- WhatsApp de Tania: {WHATSAPP}.
 """
 
-REGLAS = VOZ + """- Si toca pasarlo a Tania, la respuesta igual va natural: "Eso lo vemos directo; dime qué casa te interesa y lo revisamos." No digas que lo vas a pasar a alguien.
-""" + DATOS + """
-Antes de escribir, clasifica el último mensaje del cliente en uno de estos tipos y contesta según el tipo:
-- "vago": solo "info", "información", "precio", "disponible?", "me interesa", "ubicación", un emoji o algo sin decir qué casa. NO mandes la lista de casas. Saluda, preséntate si es el primer mensaje, comparte la página para que vea todas las casas y pregunta qué casa vio o en qué zona busca. Ejemplo: "Buenas tardes, gracias por escribirme. Soy Tania Torres, asesora inmobiliaria. Claro, con gusto te doy información. Aquí puedes ver todas mis casas con fotos y precios: {pagina} ¿Qué casa viste o en qué zona estás buscando?"
-- "casa": pregunta por una casa que se puede identificar en la lista (por municipio, precio o tipo). Da precio desde, recámaras, baños y créditos que acepta, comparte la página para ver las fotos y pregunta si tiene alguna duda o cómo piensa comprar. Si hay dos o más que podrían ser, menciónalas en una frase y pregunta cuál.
-- "busqueda": dice qué busca (zona, presupuesto, recámaras o crédito). Recomienda solo las que cumplan y comparte la página; si ninguna cumple, dilo con honestidad y pregunta si le interesa algo parecido.
-- "visita": el cliente PIDE ver una casa. Pregunta qué casa (si no se sabe), qué día y horario, y cómo piensa comprar (Infonavit, Fovissste, bancario o contado).
-- "credito": pregunta por créditos o trámites. Explica en una frase que Tania lo acompaña con el trámite y pregunta qué crédito tiene o si ya sabe cuánto le prestan.
-- "vender": quiere vender o rentar su casa. Pregunta colonia y número de recámaras, y marca pasar_a_tania.
-- "tania": descuento, negociar, apartar, papeles, escrituras, quejas o algo que no sepas. Contesta natural y marca pasar_a_tania.
-- "otro": cualquier otra cosa. Contesta breve y lleva la plática a qué está buscando.
+REGLAS = VOZ + DATOS + """
+Cómo leer el mensaje. En Facebook la gente escribe poco, con faltas o con mensajes automáticos. Antes de contestar, entiende qué quiere y clasifícalo:
+
+- "vago": "info", "informes", "+info", "imformacion", "precio", "costo", "cuánto?", "$?", "me interesa", "disponible?", "sigue disponible?", "ubicación", "dónde está?", "hola", "buenas", un emoji, un "?" o los mensajes automáticos de Facebook ("¿Me puedes dar más información?", "Hola, ¿sigue disponible?", "Me interesa esta propiedad"). No sabemos qué casa vio. NO mandes la lista de casas ni inventes cuál es. Saluda, preséntate si es el primer mensaje, comparte la página y pregunta qué casa vio o en qué zona busca.
+  Ejemplo: "Buenas tardes, gracias por escribirme. Soy Tania Torres, asesora inmobiliaria. Con gusto te doy información. Aquí puedes ver todas mis casas con fotos y precios: {pagina} ¿Cuál fue la que viste o en qué zona estás buscando?"
+- "casa": pregunta por una casa que se puede identificar (municipio, precio, tipo o algo de su descripción). Da precio desde, recámaras, baños y créditos que acepta, comparte la página para las fotos y pregunta cómo piensa comprar o si tiene alguna duda. Si dos o más podrían ser, menciónalas en una frase y pregunta cuál.
+- "busqueda": dice qué busca (zona, presupuesto, recámaras, crédito). Recomienda solo las que cumplan y comparte la página. Si ninguna cumple, dilo con honestidad y ofrece la más cercana o pregunta si puede ajustar zona o presupuesto.
+- "dinero": pregunta enganche, mensualidades, puntos de Infonavit, cuánto le prestan, gastos de escrituración, apartado. No calcules ni inventes cifras. Explica en una frase que depende de su crédito y que Tania le ayuda a revisarlo, y pregunta qué crédito tiene o cuánto le dio su precalificación. Si pregunta con cuánto se aparta o pide descuento, marca pasar_a_tania.
+- "credito": pregunta si aceptan Infonavit, Fovissste, bancario, Cofinavit, crédito conyugal, etc. Responde con lo que diga la casa (si se sabe cuál) y di que Tania lo acompaña en el trámite.
+- "visita": PIDE ver una casa. Pregunta qué casa (si no se sabe) y qué día y horario le queda; marca pasar_a_tania para que ella confirme.
+- "contacto": manda su teléfono, pide que le llamen o quiere hablar por WhatsApp. Agradece, dile que Tania le escribe y comparte el WhatsApp. Marca pasar_a_tania.
+- "vender": quiere vender o rentar su casa, o pregunta cuánto cobra Tania. Muestra interés, pregunta en qué colonia está y cuántas recámaras tiene. No digas comisiones. Marca pasar_a_tania.
+- "renta": busca rentar (no comprar). Si en la lista hay casas en renta, ofrécelas; si no, di que por ahora Tania tiene casas en venta y pregunta si le interesaría comprar con crédito.
+- "fuera": busca fuera de la zona metropolitana de Guadalajara. Di con amabilidad que Tania trabaja en Guadalajara y zona metropolitana, y pregunta si le interesa algo aquí.
+- "desconfianza": pregunta si es real, si es fraude o duda. Responde con calma: Tania es asesora inmobiliaria, puede ver sus casas en la página y escribirle por WhatsApp. Nada de presionar.
+- "cierre": "gracias", "ok", "lo pienso", "luego te aviso", "ya no me interesa". Despídete breve y amable, deja la puerta abierta, sin preguntas ni insistir.
+- "multimedia": mandó foto, audio, sticker o video y no hay texto. Di con amabilidad que por aquí no puedes ver o escuchar el archivo y pídele que te escriba qué busca.
+- "tania": queja, negociación, descuento, apartado, papeles, escrituras, otro asesor que quiere compartir comisión, o algo que no sabes. Contesta natural y breve, y marca pasar_a_tania.
+- "spam": publicidad, insultos o algo sin relación. Respuesta vacía "" y marca pasar_a_tania.
+
+Si el mensaje trae varias preguntas juntas, contesta todas brevemente en el mismo mensaje.
 
 Saludos:
 - Si es el primer mensaje de la persona, empieza con el saludo que se indica abajo y preséntate en una frase ("Soy Tania Torres, asesora inmobiliaria").
 - Si no es el primero, no vuelvas a saludar ni a presentarte; ve directo a lo que preguntó.
-- Solo ves los mensajes del cliente, no lo que Tania ya contestó. No repitas preguntas que el cliente ya respondió en sus mensajes.
-- Si pide descuento, negociar, apartar, hablar de papeles, escrituras o algo que no sepas: marca pasar_a_tania.
-- Si quiere vender o rentar su casa, pregunta colonia y número de recámaras, y marca pasar_a_tania.
+- Solo ves los mensajes del cliente, no lo que Tania le contestó. Lee todos sus mensajes para entender el contexto ("la de Tonalá" después de "info" significa que pregunta por la casa de Tonalá) y no repitas preguntas que ya respondió.
 
 Responde SOLO con este JSON:
 {"respuesta": "texto para el cliente",
-  "tipo": "vago" | "casa" | "busqueda" | "visita" | "credito" | "vender" | "tania" | "otro",
+  "tipo": "vago" | "casa" | "busqueda" | "dinero" | "credito" | "visita" | "contacto" | "vender" | "renta" | "fuera" | "desconfianza" | "cierre" | "multimedia" | "tania" | "spam",
   "pasar_a_tania": true o false,
   "motivo": "por qué Tania debe tomarlo, o vacío",
   "interes": "Comprar" | "Vender" | "Rentar" | "Crédito" | "Otro",
@@ -160,7 +178,7 @@ Si no hay datos suficientes para pensar que le interesa, di que no. Es mejor no 
 Si sí le queda, escribe un mensaje corto avisándole de la casa con su precio "desde" y compartiéndole la página para ver las fotos ({pagina}).
 Responde SOLO con este JSON: {"le_queda": true o false, "razon": "en pocas palabras", "mensaje": "texto o vacío"}"""
 
-REGLAS, SEGUIMIENTO, COINCIDENCIA = (x.replace("{pagina}", PAGINA) for x in (REGLAS, SEGUIMIENTO, COINCIDENCIA))
+VOZ, REGLAS, SEGUIMIENTO, COINCIDENCIA = (x.replace("{pagina}", PAGINA) for x in (VOZ, REGLAS, SEGUIMIENTO, COINCIDENCIA))
 
 
 def modelo(sistema, mensajes, con_casas=True):
@@ -191,7 +209,45 @@ def saludo():
     return "Buenos días" if 5 <= h < 12 else "Buenas tardes" if 12 <= h < 19 else "Buenas noches"
 
 
+# ---------- antes y después del modelo ----------
+URL_ADJUNTO = re.compile(r"https?://\S*(fbcdn|fbsbx|scontent|cdn\.fbsbx|lookaside)\S*", re.I)
+EMOJI = re.compile("[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U0001F900-\U0001F9FF️‍]+")
+
+
+def preparar(texto):
+    """Limpia el mensaje del cliente: adjuntos de Facebook, mensajes vacíos."""
+    t = (texto or "").strip()
+    if not t or URL_ADJUNTO.fullmatch(t):
+        return "[el cliente mandó una foto, audio, sticker o video, sin texto]"
+    return URL_ADJUNTO.sub("[archivo adjunto]", t)
+
+
+def revisar(out):
+    """Candados: corrige o marca lo que el modelo no debió escribir."""
+    txt, avisos = out.get("respuesta") or "", []
+    for n, mun in sorted(_cache["ocultar"].items(), key=lambda x: -len(x[0])):
+        if re.search(re.escape(n), txt, re.I):
+            # "en Viande, Tlaquepaque" -> "en Tlaquepaque"; "en Viande cuesta" -> "en Tlaquepaque cuesta"
+            txt = re.sub(re.escape(n) + r",\s*(?=" + re.escape(mun) + ")", "", txt, flags=re.I)
+            txt = re.sub(re.escape(n), mun, txt, flags=re.I)
+            avisos.append(f"cambié el nombre del fraccionamiento ({n}) por el municipio")
+    if EMOJI.search(txt):
+        txt = EMOJI.sub("", txt)
+    for m in re.finditer(r"\$\s?([\d][\d,\.]*)", txt):
+        num = int(re.sub(r"[^\d]", "", m.group(1).split(".")[0]) or 0)
+        if num >= 100000 and num not in _cache["precios"]:
+            avisos.append(f"revisa el precio {m.group(0).rstrip('.,')}: no coincide con ninguna casa")
+    if re.search(r"gratis|mi equipo|nuestro equipo", txt, re.I):
+        avisos.append("revisa la redacción: dice 'gratis' o 'mi equipo'")
+    out["respuesta"] = re.sub(r"[ \t]{2,}", " ", txt).strip()
+    if avisos:
+        out["pasar_a_tania"] = True
+        out["motivo"] = "; ".join(filter(None, [out.get("motivo", ""), *avisos]))
+    return out
+
+
 def pedir(historial, primero=False):
+    historial = [{"role": h["role"], "content": preparar(h["content"]) if h["role"] == "user" else h["content"]} for h in historial]
     contexto = (f"\n\nEs el PRIMER mensaje de esta persona. Saludo que corresponde ahora: \"{saludo()}\"." if primero
                 else "\n\nNo es el primer mensaje de esta persona: no la saludes de nuevo.")
     out = modelo(REGLAS + contexto, historial)
@@ -199,7 +255,7 @@ def pedir(historial, primero=False):
         out = {"respuesta": out["_crudo"], "pasar_a_tania": True, "motivo": "El modelo no respondió en el formato esperado"}
     out.setdefault("respuesta", "")
     out.setdefault("pasar_a_tania", False)
-    return out
+    return revisar(out)
 
 
 # ---------- modo prueba ----------
@@ -288,6 +344,7 @@ def tarea_seguimientos(db):
             continue
         r = modelo(SEGUIMIENTO, [{"role": "user", "content": f"Prospecto: {ficha(p)}\nDías sin contacto: {dias_desde(p.get('lastContact'))}"}])
         if r.get("mensaje"):
+            r["mensaje"] = revisar({"respuesta": r["mensaje"]})["respuesta"]
             doc.reference.update({"aiFollow": r["mensaje"], "aiFollowFor": clave, "aiFollowAt": datetime.now(TZ).isoformat()})
             log(f"Seguimiento listo para {p.get('name')}")
 
@@ -312,6 +369,7 @@ def tarea_casas_nuevas(db):
             r = modelo(COINCIDENCIA, [{"role": "user", "content": f"Casa nueva: {json.dumps(casa, ensure_ascii=False)}\nProspecto: {ficha(p)}"}],
                        con_casas=False)
             if r.get("le_queda") and r.get("mensaje"):
+                r["mensaje"] = revisar({"respuesta": r["mensaje"]})["respuesta"]
                 doc.reference.update({"aiMatch": {"casa": casa["titulo"], "razon": r.get("razon", ""), "mensaje": r["mensaje"],
                                                   "at": datetime.now(TZ).isoformat()}})
                 log(f"  Le queda a {p.get('name')}: {r.get('razon', '')}")

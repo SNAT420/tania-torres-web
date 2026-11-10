@@ -13,14 +13,14 @@ Uso:
        cada 10 min: si hay casa nueva en la página, avisa a quién le queda
 
 Variables opcionales:
-  OLLAMA_MODEL   modelo de Ollama (por defecto qwen3:8b)
+  OLLAMA_MODEL   modelo de Ollama (por defecto gpt-oss:20b)
   FIREBASE_KEY   ruta al JSON de la cuenta de servicio (por defecto ./cuenta-servicio.json)
 """
 import json, os, re, sys, time, unicodedata, urllib.request
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-MODELO = os.environ.get("OLLAMA_MODEL", "qwen3:8b")
+MODELO = os.environ.get("OLLAMA_MODEL", "gpt-oss:20b")
 OLLAMA = "http://localhost:11434/api/chat"
 PROYECTO = "tania-torres-web"
 WHATSAPP = "33 2277 5288"
@@ -262,8 +262,56 @@ def revisar(out):
     return out
 
 
+# ---------- respuestas fijas: lo más común lo contesta el código, sin IA ----------
+PALABRAS_VAGAS = set("""info infos informacion informes informe imformacion imfo ifo mas + precio precios costo costos cuanto cuánto cuesta
+vale sale disponible disponibles sigue aun todavia interesa interesada interesado me mi hola holi buenas buenos buen tardes dias noches
+noche tarde dia porfa por favor fa pf la el los las de del que es y o puedes puede podria podrías dar das da sobre esto este esta
+propiedad propiedades casa casas depa departamento ubicacion donde se encuentra queda ver detalles quiero quisiera saber gustaria
+obtener un una algo mandame mande manda envia enviame pasa pasame igual igualmente gracias ok okay va""".split())
+SALIDAS = {"gracias", "ok", "okay", "va", "vale", "sale", "listo", "perfecto", "lo pienso", "lo voy a pensar", "luego te aviso",
+           "luego le aviso", "yo te aviso", "yo le aviso", "ya no me interesa", "no gracias", "muchas gracias", "ok gracias",
+           "gracias igualmente", "excelente gracias", "bueno gracias", "ah ok", "esta bien", "ok, gracias", "de acuerdo"}
+
+
+def _palabras(t):
+    return re.findall(r"[a-zñ]+|\d+", _sin_acentos(t.lower()))
+
+
+def respuesta_fija(historial, primero):
+    """Regresa una respuesta lista si el mensaje es de los que siempre se contestan igual; si no, None."""
+    ult = historial[-1]["content"]
+    norm = re.sub(r"[^a-z0-9ñ ]", " ", _sin_acentos(ult)).split()
+    hola = f"{saludo()}, gracias por escribirme. Soy Tania Torres, asesora inmobiliaria. " if primero else ""
+    usted = re.search(r"\b(usted|podria|le |su |gustaria)\b", _sin_acentos(ult))
+
+    if ult.startswith("[el cliente mandó"):
+        return {"tipo": "multimedia", "respuesta": hola + ("Por aquí no puedo ver ni escuchar archivos. ¿Me escribe qué casa le interesa o qué está buscando?"
+                if usted else "Por aquí no puedo ver ni escuchar archivos. ¿Me escribes qué casa te interesa o qué estás buscando?"),
+                "pasar_a_tania": False, "motivo": "", "interes": "Otro"}
+    tel = re.search(r"(?:\+?52[\s-]?)?(?:\d[\s-]?){10}", ult)
+    digitos = re.sub(r"\D", "", tel.group(0)) if tel else ""
+    if tel and len(ult) < 70:
+        return {"tipo": "contacto", "respuesta": hola + f"Gracias, te escribo por WhatsApp en un momento. Si prefieres, mi número es {WHATSAPP}.",
+                "pasar_a_tania": True, "motivo": f"Dejó su teléfono: {digitos[-10:]}", "interes": "Otro"}
+    if not primero and " ".join(norm) in SALIDAS:
+        return {"tipo": "cierre", "respuesta": "Con gusto. Aquí estoy para cuando lo necesites, y en la página puedes ver las casas cuando quieras: " + PAGINA,
+                "pasar_a_tania": False, "motivo": "", "interes": "Otro"}
+    # vago: todas sus palabras son genéricas (info, precio, disponible...) y no menciona zona, cifra ni detalle
+    todos = " ".join(h["content"] for h in historial if h["role"] == "user")
+    if all(w in PALABRAS_VAGAS for w in _palabras(todos)) and not re.search(r"\d", todos):
+        if usted:
+            txt = f"Con gusto le doy información. Aquí puede ver todas mis casas con fotos y precios: {PAGINA} ¿Cuál fue la que vio o en qué zona está buscando?"
+        else:
+            txt = f"Con gusto te doy información. Aquí puedes ver todas mis casas con fotos y precios: {PAGINA} ¿Cuál fue la que viste o en qué zona estás buscando?"
+        return {"tipo": "vago", "respuesta": hola + txt, "pasar_a_tania": False, "motivo": "", "interes": "Comprar"}
+    return None
+
+
 def pedir(historial, primero=False):
     historial = [{"role": h["role"], "content": preparar(h["content"]) if h["role"] == "user" else h["content"]} for h in historial]
+    fija = respuesta_fija(historial, primero)
+    if fija:
+        return fija
     contexto = (f"\n\nEs el PRIMER mensaje de esta persona. Saludo que corresponde ahora: \"{saludo()}\"." if primero
                 else "\n\nNo es el primer mensaje de esta persona: no la saludes de nuevo.")
     out = modelo(REGLAS + contexto, historial, esquema=ESQ_RESPUESTA)

@@ -137,12 +137,27 @@ Reglas que no se rompen:
 """
 
 REGLAS = VOZ + """- Si toca pasarlo a Tania, la respuesta igual va natural: "Eso lo vemos directo; dime qué casa te interesa y lo revisamos." No digas que lo vas a pasar a alguien.
-""" + DATOS + """- Si quiere visitar, pregunta qué casa, qué día y horario, y cómo piensa comprar (Infonavit, Fovissste, bancario o contado).
+""" + DATOS + """
+Antes de escribir, clasifica el último mensaje del cliente en uno de estos tipos y contesta según el tipo:
+- "vago": solo "info", "información", "precio", "disponible?", "me interesa", "ubicación", un emoji o algo sin decir qué casa. NO mandes la lista de casas. Saluda, preséntate si es el primer mensaje y pregunta qué casa vio o en qué zona busca. Ejemplo: "Buenas tardes, gracias por escribirme. Soy Tania Torres, asesora inmobiliaria. Claro, con gusto te doy información. ¿Qué casa viste o en qué zona estás buscando?"
+- "casa": pregunta por una casa que se puede identificar en la lista (por municipio, precio o tipo). Da precio desde, recámaras, baños y créditos que acepta, y ofrece fotos o visita. Si hay dos o más que podrían ser, menciónalas en una frase y pregunta cuál.
+- "busqueda": dice qué busca (zona, presupuesto, recámaras o crédito). Recomienda solo las que cumplan; si ninguna cumple, dilo con honestidad y pregunta si le interesa algo parecido.
+- "visita": quiere ver una casa. Pregunta qué casa (si no se sabe), qué día y horario, y cómo piensa comprar (Infonavit, Fovissste, bancario o contado).
+- "credito": pregunta por créditos o trámites. Explica en una frase que Tania lo acompaña con el trámite y pregunta qué crédito tiene o si ya sabe cuánto le prestan.
+- "vender": quiere vender o rentar su casa. Pregunta colonia y número de recámaras, y marca pasar_a_tania.
+- "tania": descuento, negociar, apartar, papeles, escrituras, quejas o algo que no sepas. Contesta natural y marca pasar_a_tania.
+- "otro": cualquier otra cosa. Contesta breve y lleva la plática a qué está buscando.
+
+Saludos:
+- Si es el primer mensaje de la persona, empieza con el saludo que se indica abajo y preséntate en una frase ("Soy Tania Torres, asesora inmobiliaria").
+- Si no es el primero, no vuelvas a saludar ni a presentarte; ve directo a lo que preguntó.
+- Solo ves los mensajes del cliente, no lo que Tania ya contestó. No repitas preguntas que el cliente ya respondió en sus mensajes.
 - Si pide descuento, negociar, apartar, hablar de papeles, escrituras o algo que no sepas: marca pasar_a_tania.
 - Si quiere vender o rentar su casa, pregunta colonia y número de recámaras, y marca pasar_a_tania.
 
 Responde SOLO con este JSON:
 {"respuesta": "texto para el cliente",
+  "tipo": "vago" | "casa" | "busqueda" | "visita" | "credito" | "vender" | "tania" | "otro",
   "pasar_a_tania": true o false,
   "motivo": "por qué Tania debe tomarlo, o vacío",
   "interes": "Comprar" | "Vender" | "Rentar" | "Crédito" | "Otro",
@@ -186,8 +201,15 @@ def modelo(sistema, mensajes, con_casas=True):
         return {"_crudo": texto}
 
 
-def pedir(historial):
-    out = modelo(REGLAS, historial)
+def saludo():
+    h = datetime.now(TZ).hour
+    return "Buenos días" if 5 <= h < 12 else "Buenas tardes" if 12 <= h < 19 else "Buenas noches"
+
+
+def pedir(historial, primero=False):
+    contexto = (f"\n\nEs el PRIMER mensaje de esta persona. Saludo que corresponde ahora: \"{saludo()}\"." if primero
+                else "\n\nNo es el primer mensaje de esta persona: no la saludes de nuevo.")
+    out = modelo(REGLAS + contexto, historial)
     if "_crudo" in out:
         out = {"respuesta": out["_crudo"], "pasar_a_tania": True, "motivo": "El modelo no respondió en el formato esperado"}
     out.setdefault("respuesta", "")
@@ -204,8 +226,8 @@ def chat():
         if msg.lower() in ("salir", "exit", "/bye"):
             break
         historial.append({"role": "user", "content": msg})
-        r = pedir(historial)
-        print(f"\nTania (borrador): {r['respuesta']}")
+        r = pedir(historial, primero=len(historial) == 1)
+        print(f"\nTania (borrador) [{r.get('tipo', '?')}]: {r['respuesta']}")
         if r.get("pasar_a_tania"):
             print(f"  >> Pasar a Tania: {r.get('motivo', '')}")
         if r.get("cita"):
@@ -255,10 +277,10 @@ def tarea_bandeja(db):
         if not m.get("messages") or m.get("draftFor") == m.get("lastAt"):
             continue  # ya tiene borrador para el último mensaje
         historial = [{"role": "user", "content": x["text"]} for x in m["messages"][-10:] if x.get("text")]
-        r = pedir(historial)
+        r = pedir(historial, primero=not m.get("draftFor") and len(m["messages"]) <= 2)
         doc.reference.update({
             "draft": r["respuesta"], "draftHandoff": bool(r.get("pasar_a_tania")), "draftReason": r.get("motivo", ""),
-            "draftInterest": r.get("interes", ""), "draftAppt": r.get("cita"),
+            "draftInterest": r.get("interes", ""), "draftAppt": r.get("cita"), "draftType": r.get("tipo", ""),
             "draftFor": m.get("lastAt"), "draftAt": datetime.now(TZ).isoformat(),
         })
         log(f"Respuesta sugerida para {m.get('name') or m.get('username') or doc.id}")

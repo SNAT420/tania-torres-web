@@ -2707,5 +2707,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     .catch(e => console.warn('Mapa del hero no disponible', e));
   if (document.readyState === 'complete') setTimeout(iniciar, 200); else addEventListener('load', () => setTimeout(iniciar, 200));
 </script>
+<!-- Vercel Web Analytics -->
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
